@@ -1,0 +1,2 @@
+ErrorDocument 404 /oeg5370/235/error/error.html
+DirectoryIndex noterror.html
