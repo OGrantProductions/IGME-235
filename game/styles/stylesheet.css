@@ -1,5 +1,11 @@
+/* * {
+    border: 1px solid gray;
+} */
+
 body {
-    background-color: lightblue;
+    background-color: #FFECD1;
+    font-family: Arial, sans-serif;
+    color: #373F51;
 }
 
 .titleImage {
@@ -9,18 +15,28 @@ body {
 }
 
 h1 {
-    color: red;
-    font-family: sans-serif;
-    border-bottom: 1px solid blue;
+    color: #78290F;
+    font-family: 'Red Hat Display', sans-serif;
+    border-bottom: 1px solid #004E98;
 }
 
 h2 {
-    color: blueviolet;
+    color: #004E98;
+    font-family: 'Roboto Mono', monospace;
     margin-left: 25px;
+}
+
+h3 {
+    color: #373F51;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 p {
     margin-left: 100px;
+}
+
+hr {
+    border: 1px solid #FF6700;
 }
 
 ul {
@@ -33,6 +49,20 @@ img.side {
 }
 
 blockquote {
-    background-color: lightgray;
+    background-color: #78290F;
     padding: 1rem;
+    color: #FFECD1;
+}
+
+a:link{
+    color: #004E98
+}
+a:visited{
+    color: #FF6700;
+}
+a:focus, a:hover{
+    color: #373F51;
+}
+a:active{
+    color: #78290F;
 }
