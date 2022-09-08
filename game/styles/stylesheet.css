@@ -1,0 +1,38 @@
+body {
+    background-color: lightblue;
+}
+
+.titleImage {
+    display: block;
+    margin: auto;
+    width: 80%;
+}
+
+h1 {
+    color: red;
+    font-family: sans-serif;
+    border-bottom: 1px solid blue;
+}
+
+h2 {
+    color: blueviolet;
+    margin-left: 25px;
+}
+
+p {
+    margin-left: 100px;
+}
+
+ul {
+    margin-left: 75px;
+}
+
+img.side {
+    float: right;
+    margin: 0 12px;
+}
+
+blockquote {
+    background-color: lightgray;
+    padding: 1rem;
+}
