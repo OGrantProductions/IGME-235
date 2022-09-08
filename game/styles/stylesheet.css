@@ -54,6 +54,10 @@ blockquote {
     color: #FFECD1;
 }
 
+#bigPic{
+    width: 100%
+}
+
 a:link{
     color: #004E98
 }
