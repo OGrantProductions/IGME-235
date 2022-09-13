@@ -3,9 +3,17 @@
 } */
 
 body {
-    background-color: #FFECD1;
+    background-color: #373F51;
     font-family: Arial, sans-serif;
     color: #373F51;
+}
+
+main, header, footer{
+    background-color: #FFECD1;
+    margin: 0 auto;
+    border: 1px solid black;
+    width: 80vw;
+    padding: 1rem;
 }
 
 .titleImage {
