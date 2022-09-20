@@ -53,21 +53,21 @@ p {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
-    height: 300px;
     width: 100%;
 }
 
 .projectDiv {
     text-align: center;
     width: 33%;
+    flex: 1 0 400px;
 }
 
 .projectTitle {
     font-size: 28px;
 }
 
-.placeholdImage{
-    width: 90%;
+.projectImage{
+    width: 80%;
 }
 
 footer img {
@@ -92,5 +92,5 @@ a:hover {
 }
 
 a:active {
-    color: #080029;
+    color: white;
 }
