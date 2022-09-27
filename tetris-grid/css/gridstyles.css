@@ -49,6 +49,7 @@ ul.menu {
     padding: 10px;
     color: white;
     text-decoration: none;
+    transition: transform 0.1s ease-in, background-color 0.5s linear;
 }
 
 .menu li {
@@ -64,6 +65,7 @@ ul.menu {
 .menu a:hover {
     background: red;
     color: yellow;
+    transform:scale(1.1);
 }
 
 ul.menu ul li {
@@ -125,6 +127,23 @@ footer {
 #z {
     grid-column: 2/span 2;
     grid-row: 2/span 3;
+}
+
+#s{
+    grid-column: 3/span 3;
+    grid-row: 3/span 2;
+}
+
+#t {
+    transform: translateX(5px) translateY(5px) rotate(180deg);
+    grid-column: 4/span 3;
+    grid-row: 3/span 3;
+}
+
+#l{
+    transform: translateY(5px) rotate(-90deg);
+    grid-column: 1/span 1;
+    grid-row: 5/5;
 }
 
 img {
