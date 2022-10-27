@@ -22,7 +22,8 @@
          */
         window.onload = function () {
             makeSampleMonsters();
-            showMonsters();
+            showMonsters("Goomba", "#goombas");
+            showMonsters("Boo", "#boos");
         }
 
         /**
@@ -47,24 +48,27 @@
         }
 
         /**
-         * Function that shows our monsters (just Goombas for now)
+         * Function that shows our monsters
          * 
          */
-        function showMonsters() {
-            let goombaList = document.querySelector("#goombas");
-            let booList = document.querySelector("#boos");
+        function showMonsters(monsterType, listID) {
+            let monsterList = document.querySelector(listID);
 
             for (let i = 0; i < monsters.length; i++) {
                 let liStr = "";
                 let li = document.createElement("li");
 
-                for (let key in monsters[i]) {
-                    if (typeof monsters[i][key] !== "function") {
-                        liStr += `<b>${key}:</b> ${monsters[i][key]}<br />`;
+                if (monsters[i].type == monsterType) {
+                    for (let key in monsters[i]) {
+                        if (typeof monsters[i][key] !== "function") {
+                            liStr += `<b>${key}:</b> ${monsters[i][key]}<br />`;
+                        }
                     }
+
+
+                    li.innerHTML = liStr;
+                    monsterList.appendChild(li);
                 }
-                li.innerHTML = liStr;
-                goombaList.appendChild(li);
             }
         }
 
@@ -78,8 +82,9 @@
                 hp: 100,
                 speed: 10,
                 score: 100,
+                type: "Monster",
                 status: function () {
-                    console.log("name: " + this.name + ", hp: " + this.hp + ", speed: " + this.speed + ", score: " + this.score);
+                    console.log("name: " + this.name + ", hp: " + this.hp + ", speed: " + this.speed + ", score: " + this.score + ", type: " + this.type);
                 }
             }
         }
@@ -94,6 +99,7 @@
             goomba.hp = hp;
             goomba.speed = speed;
             goomba.score = score;
+            goomba.type = "Goomba";
             goomba.takeDamage = function (dmgVal) {
                 goomba.hp -= dmgVal;
             }
@@ -113,6 +119,7 @@
             boo.hp = hp;
             boo.speed = speed;
             boo.score = score;
+            boo.type = "Boo";
             boo.takeDamage = function (dmgVal) {
                 boo.hp -= dmgVal;
             }
