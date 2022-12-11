@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Haikyu Team Mottos</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Righteous&family=Secular+One&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>Haikyu!! Team Mottos</h1>
+    </header>
+    <main>
+        <p id="slogan">Team Slogan</p>
+        <button>Get Another Motto!</button>
+    </main>
+    <footer>
+        <p>Copyright 2022 Omar Grant</p>
+    </footer>
+    <script>
+        let mottos =
+            [
+                { teamMotto: `"Fly" <br>- Karasuno High`, teamImage: `images/karasuno.jpg` },
+                { teamMotto: `"Connect" <br>- Nekoma High`, teamImage: `images/nekoma.jpg` },
+                { teamMotto: `"Rule the Court" <br>- Aoba Johsai High`, teamImage: `images/aobaJohsai.png` },
+                { teamMotto: `"Irresistible Force" <br>- Shiratorizawa Academy`, teamImage: `images/shiratorizawa.jpg` },
+                { teamMotto: `"One Ball, Heart, and Soul" <br>- Fukurōdani Academy`, teamImage: `images/fukurodani.png` },
+                { teamMotto: `"Who Needs Memories" <br>- Inarizaki High`, teamImage: `images/inarizaki.png` },
+                { teamMotto: `"Habit Becomes Second Nature" <br>- Kamomedai High`, teamImage: `images/kamomedai.jpg` },
+                { teamMotto: `"Iron Wall of Date" <br>- Date Tech High`, teamImage: `images/dateTech.png` },
+                { teamMotto: `"Effort" <br>- Itachiyama Institute`, teamImage: `images/itachiyama.png` },
+                { teamMotto: `"Fair and Square" <br>- Nohebi Academy`, teamImage: `images/nohebi.png` },
+                { teamMotto: `"Even Small Streams Form Strong Rivers" <br>- Tsubakihara Academy`, teamImage: `images/tsubakihara.jpg` },
+                { teamMotto: `"Show us Your Tenacity" <br>- Wakutani Minami High`, teamImage: `images/wakutani.png` },
+                { teamMotto: `"Simplicity and Fortitude" <br>- Johzenji High`, teamImage: `images/johzenji.png` },
+                { teamMotto: `"Rising Up Every Time" <br>- Sarukawa Tech High`, teamImage: `images/sarukawa.png` },
+                { teamMotto: `"Certain Victory" <br>- Kitagawa Daiichi Junior High`, teamImage: `images/kitagawaDaiichi.png` }
+            ]
+
+        slogan = document.getElementById("slogan");
+
+        // Randomly picks a team motto and image to display
+        function changeMotto() {
+            let teamNumber = Math.floor(Math.random() * mottos.length);
+
+            //check to prevent repeats
+            if (mottos[teamNumber].teamMotto == slogan.innerHTML) {
+                teamNumber = Math.floor(Math.random() * mottos.length);
+            }
+            else {
+                slogan.innerHTML = mottos[teamNumber].teamMotto;
+                document.body.style.backgroundImage = `url(${mottos[teamNumber].teamImage})`;
+            }
+            console.log(mottos[teamNumber]);
+        }
+
+        document.body.onload = changeMotto; // change the motto and background whenever the page is loaded or refreshed
+        document.querySelector("button").onclick = changeMotto; // change the motto and background when the button is clicked
+    </script>
+</body>
+
+</html>
