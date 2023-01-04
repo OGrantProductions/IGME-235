@@ -1,38 +1,88 @@
+html{
+    margin: 0;
+}
 body {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 35vh 1fr 5vh;
+    grid-template-rows: auto 1fr 25vh;
     grid-template-areas:
         "header"
         "main"
         "footer";
-    margin: 0 4em;
-    background-color: #D84A3B;
+    margin: 0 auto;
+    background-color: #CD4637;
 }
 
 p {
     color: white;
 }
 
+/*Nav Bar Start*/
+ul.menu { 
+    grid-area: header; 
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    text-align: center;
+    z-index: 1;
+}
+.submenu{
+    position: static;
+}
+ul.menu ul {
+    display:none;
+}
+ul.menu li:hover ul {
+    display:flex;
+    flex-direction: column;
+}
+.menu a {
+    display: block;
+    background: #E5DCD0;
+    padding: 10px;
+    color: #874937;
+    text-decoration: none;
+    transition: transform 0.1s ease-in, background-color 0.5s linear;
+    flex-basis: auto;
+}
+.menu li {
+    width: 25%;
+}
+.menu a:hover {
+	background: #874937;
+	color: #E5DCD0;
+    transform:scale(1.1);
+}
+/*Nav Bar End*/
+
 main {
     grid-area: main;
     display: grid;
-    grid-template-columns: 20vw 1fr;
-    grid-template-rows: 0.8fr 1fr 1fr;
+    width: 80%;
+    grid-template-rows: auto auto auto auto;
     grid-template-areas:
-        "gravity gravity"
-        "craft   mill"
-        "craft   lee";
+        "title"
+        "aboutMe"
+        "projects"
+        "resume";
+    margin: auto;
 }
 
 header {
     grid-area: header;
-    padding: 2em;
 }
 
 h1{
+    grid-area: title;
     font-size: 72pt;
     font-family: 'Black Han Sans', sans-serif;
+    text-align: center;
+    color: #1D221E;
 }
 
 header h1 {
@@ -42,53 +92,93 @@ header h1 {
 h2{
     font-weight: 800;
     font-family: sans-serif;
+    font-size: 30pt;
+    color: #1D221E;
 }
 
-header h3 {
-    margin-top: 0;
-    color: white;
+h3{
+    color:#E5DCD0;
+    font-size: 24pt;
 }
 
-#gravity {
-    grid-area: gravity;
+#aboutMe {
+    grid-area: aboutMe;
     display: flex;
-    padding: 2em;
+    padding: 0 2em;
 }
 
 .pageText {
     padding: 1em 2em;
+    width: 100%;
 }
 
-#gravity img {
-    width: 50vw;
+#aboutMe img {
+    width: 50%;
 }
 
-#craft {
-    grid-area: craft;
-    padding: 2em;
-}
-
-#mill {
-    grid-area: mill;
+#projectList {
+    grid-area: projects;
     padding: 2em;
     display: flex;
+    text-align: center;
+    flex-flow: column nowrap;
+    margin: 0 auto;
 }
 
-#mill img {
-    width: 30vw;
+.project {
+    display: grid;
+    grid-template-columns: 40% auto;
+    grid-template-rows: 20% auto;
+    grid-template-areas: 
+    "projectImage   projectTitle"
+    "projectImage   projectInfo";
+    margin: 1em;
+    border: 1px solid #1D221E;
 }
 
-#lee {
-    grid-area: lee;
+.project img{
+    grid-area: projectImage;
+    width: 100%;
+    margin: 1em;
+}
+
+.project h3{
+    grid-area: projectTitle;
+    font-size: 20pt;
+}
+
+.project p{
+    grid-area: projectInfo;
+    margin: 2em 3em;
+    text-align: left;
+}
+
+#resume {
+    grid-area: resume;
     padding: 2em;
-    display: flex;
-}
-
-#lee img {
-    width: 35vw;
 }
 
 footer {
     grid-area: footer;
-    background-color: black;
+    background-color: #874937;
+    color: #E5DCD0;
+    margin: auto 1em;
+    padding: 2em;
+    text-align: center;
+}
+
+a:link{
+    color: #E5DCD0;
+}
+
+a:visited{
+    color: #1D221E;
+}
+
+a:hover, a:focus{
+    color: #A7A99D;
+}
+
+a:active{
+    color: #CD4637;
 }
