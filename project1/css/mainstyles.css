@@ -50,6 +50,9 @@ ul.menu li:hover ul {
     transition: transform 0.1s ease-in, background-color 0.5s linear;
     flex-basis: auto;
 }
+.menu a:link, .menu a:visited, .menu a:hover, .menu a:focus, .menu a:active{
+    color: #874937;
+}
 .menu li {
     width: 25%;
 }
