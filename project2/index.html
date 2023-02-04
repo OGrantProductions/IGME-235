@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Who's That Pokemon?</title>
+    <script src="js/main.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Who's That Pokemon?</h1>
+    </header>
+
+    <div class="widgets">
+        Your Guess ->
+        <input id="guessterm" type="text" size="20" maxlength="20" autofocus value="lucario" />
+    </div>
+    <div class="widgets">
+        <button type="button" id="submit" class="green">Make A Guess</button>
+    </div>
+
+
+
+    <div class="widgets">
+        Guesses allowed ->
+        <select id="limit">
+            <option value="5" selected>5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+        </select>
+    </div>
+
+    <div class="widgets">
+        <button type="button" id="refresh" class="green">New Pokemon!<br />:-)</button>
+    </div>
+    <div id="status">Ready to Search!</div>
+    <hr>
+
+    <h2>Results</h2>
+    <div id="content">
+        <p>No data yet!</p>
+    </div>
+
+
+</body>
+
+</html>
