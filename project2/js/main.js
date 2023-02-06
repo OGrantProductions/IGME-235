@@ -2,6 +2,8 @@ const POKE_URL = "https://pokeapi.co/api/v2/pokemon";
 let pokemonGuessInfo; // array for the info of the pokemon to be guessed
 let userGuessInfo; // array for the info of the pokemon the user guesses
 let numGuessesUsed;
+let maxNumGuesses;
+let winStatus;
 
 // 1
 window.onload = (e) => {
@@ -10,11 +12,12 @@ window.onload = (e) => {
     document.querySelector("#refresh").onclick = getNewGuess;
 };
 
-// 2
-let displayTerm = "";
-
 function getNewGuess() {
     numGuessesUsed = 0;
+    winStatus = false;
+    maxNumGuesses = document.querySelector("#limit").value;
+    document.querySelector("#content").innerHTML = "";
+    document.querySelector("#status").innerHTML = `<b>You have ${maxNumGuesses} guesses Left!</b>`;
     const MAX_POKE = 1008;
     let randNum = Math.floor(Math.random() * MAX_POKE);
 
@@ -39,7 +42,6 @@ function submitButtonClicked() {
 
     // 3 - parse the user entered term we wish to search
     let term = document.querySelector("#guessterm").value;
-    displayTerm = term;
 
     // 4 - get rid of any leading and trailing spaces
     term = term.trim();
@@ -52,9 +54,6 @@ function submitButtonClicked() {
 
     // 7 - append the search term to the URL
     url += "/" + term + "/";
-
-    // 8 - update the UI
-    document.querySelector("#status").innerHTML = "<b>Searching for '" + displayTerm + "'</b>";
 
     // 9 - see what the URL looks like
     console.log(url);
@@ -100,10 +99,10 @@ function mainPokemonDataLoaded(e) {
     }
 
     if (obj.types.length > 1) {
-        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight, height: obj.height }
+        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 }
     }
     else {
-        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight, height: obj.height }
+        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight / 10, height: obj.height / 10 }
     }
     console.log(pokemonGuessInfo);
 }
@@ -125,15 +124,16 @@ function userGuessDataLoaded(e) {
     }
 
     if (obj.types.length > 1) {
-        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight, height: obj.height }
+        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 }
     }
     else {
-        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight, height: obj.height }
+        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight / 10, height: obj.height / 10 }
     }
     console.log(userGuessInfo);
     compareData(pokemonGuessInfo, userGuessInfo);
 }
 
+// Determine the generation of the pokemon based on their ID
 function getGeneration(id) {
     if (id > 0 && id <= 151) {
         return 1;
@@ -164,66 +164,93 @@ function getGeneration(id) {
     }
 }
 
+// Compares the data between the user's guesses and the pokemon to be guessed
 function compareData(mainPokemon, userGuess) {
-
-    numGuessesUsed++;
-    // ES6 String Templating
-    let line = `<div class = 'guess'><ul>`;
-    line += `<li>Guess #${numGuessesUsed}</li>`;
-    line += `<li>Name: ${userGuess.name}</li>`;
-
-    // compare generation numbers
-    if (mainPokemon.generation < userGuess.generation) {
-        line += `<li>Generation: ${userGuess.generation}, Lower</li>`;
+    if (maxNumGuesses - numGuessesUsed == 0 && winStatus == false) { // ensures the user doesn't keep making guesses once they run out
+        document.querySelector("#status").innerHTML = `<b>Game Over! The Pokemon was ${mainPokemon.name}.</b>`;
     }
-    else if (mainPokemon.generation > userGuess.generation) {
-        line += `<li>Generation: ${userGuess.generation}, Higher</li>`;
+    else if (winStatus == true) {
+        document.querySelector("#status").innerHTML = `<b>You got it in ${numGuessesUsed} guesses! The Pokemon was ${mainPokemon.name}!</b>`;
     }
     else {
-        line += `<li>Generation: ${userGuess.generation}, Same</li>`;
-    }
+        numGuessesUsed++;
+        let numGuessesLeft = maxNumGuesses - numGuessesUsed;
+        let line = `<div class = 'guess'>`;
+        line += `<h3>Guess #${numGuessesUsed}</h3><ul>`;
+        line += `<li>Name: ${userGuess.name}</li>`;
 
-    // compare primary types
-    if (mainPokemon.type1 == userGuess.type1) {
-        line += `<li>Primary Type: ${userGuess.type1}, Match</li>`;
-    }
-    else {
-        line += `<li>Primary Type: ${userGuess.type1}, No Match</li>`;
-    }
+        // compare generation numbers
+        if (mainPokemon.generation < userGuess.generation) {
+            line += `<li>Generation: ${userGuess.generation}, Lower</li>`;
+        }
+        else if (mainPokemon.generation > userGuess.generation) {
+            line += `<li>Generation: ${userGuess.generation}, Higher</li>`;
+        }
+        else {
+            line += `<li>Generation: ${userGuess.generation}, Same</li>`;
+        }
 
-    // compare secondary types
-    if (mainPokemon.type2 == userGuess.type2) {
-        line += `<li>Secondary Type: ${userGuess.type2}, Match</li>`;
-    }
-    else {
-        line += `<li>Secondary Type: ${userGuess.type2}, No Match</li>`;
-    }
+        // compare primary types
+        if (mainPokemon.type1 == userGuess.type1) {
+            line += `<li>Primary Type: ${userGuess.type1}, Match</li>`;
+        }
+        else {
+            line += `<li>Primary Type: ${userGuess.type1}, No Match</li>`;
+        }
 
-    // compare heights
-    if (mainPokemon.height < userGuess.height) {
-        line += `<li>Height: ${userGuess.height}, Lower</li>`;
-    }
-    else if (mainPokemon.height > userGuess.height) {
-        line += `<li>Height: ${userGuess.height}, Higher</li>`;
-    }
-    else {
-        line += `<li>Height: ${userGuess.height}, Same</li>`;
-    }
+        // compare secondary types
+        if (mainPokemon.type2 == userGuess.type2) {
+            line += `<li>Secondary Type: ${userGuess.type2}, Match</li>`;
+        }
+        else {
+            line += `<li>Secondary Type: ${userGuess.type2}, No Match</li>`;
+        }
 
-    // compare weights
-    if (mainPokemon.weight < userGuess.weight) {
-        line += `<li>Weight: ${userGuess.weight}, Lower</li>`;
-    }
-    else if (mainPokemon.weight > userGuess.weight) {
-        line += `<li>Weight: ${userGuess.weight}, Higher</li>`;
-    }
-    else {
-        line += `<li>Weight: ${userGuess.weight}, Same</li>`;
-    }
+        // compare heights
+        if (mainPokemon.height < userGuess.height) {
+            line += `<li>Height: ${userGuess.height}m, Lower</li>`;
+        }
+        else if (mainPokemon.height > userGuess.height) {
+            line += `<li>Height: ${userGuess.height}m, Higher</li>`;
+        }
+        else {
+            line += `<li>Height: ${userGuess.height}m, Same</li>`;
+        }
 
-    line += `</ul></div>`;
+        // compare weights
+        if (mainPokemon.weight < userGuess.weight) {
+            line += `<li>Weight: ${userGuess.weight}kg, Lower</li>`;
+        }
+        else if (mainPokemon.weight > userGuess.weight) {
+            line += `<li>Weight: ${userGuess.weight}kg, Higher</li>`;
+        }
+        else {
+            line += `<li>Weight: ${userGuess.weight}kg, Same</li>`;
+        }
 
-    document.querySelector("#content").innerHTML += line;
+        line += `</ul></div>`;
+
+        document.querySelector("#content").innerHTML += line;
+
+        // checks to see if the user guess matches the desired pokemon
+        if (mainPokemon.generation == userGuess.generation &&
+            mainPokemon.type1 == userGuess.type1 &&
+            mainPokemon.type2 == userGuess.type2 &&
+            mainPokemon.height == userGuess.height &&
+            mainPokemon.weight == userGuess.weight) {
+
+            document.querySelector("#status").innerHTML = `<b>You got it in ${numGuessesUsed} guesses! The Pokemon was ${mainPokemon.name}!</b>`;
+            winStatus = true;
+        }
+        else { // if doesn't match the desired pokemon
+            if (numGuessesLeft == 0) {
+                document.querySelector("#status").innerHTML = `<b>Game Over! The Pokemon was ${mainPokemon.name}.</b>`;
+            }
+            else {
+                document.querySelector("#status").innerHTML = `<b>You have ${numGuessesLeft} guesses Left!</b>`;
+            }
+        }
+    }
 }
 
 function dataError(e) {
