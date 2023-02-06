@@ -1,9 +1,10 @@
 const POKE_URL = "https://pokeapi.co/api/v2/pokemon";
-let pokemonToBeGuessedData;
-let userGuessData;
+let pokemonGuessInfo; // array for the info of the pokemon to be guessed
+let userGuessInfo; // array for the info of the pokemon the user guesses
+let numGuessesUsed;
 
 // 1
-window.onload = (e) => { 
+window.onload = (e) => {
     document.querySelector("#submit").onclick = submitButtonClicked;
     getNewGuess();
     document.querySelector("#refresh").onclick = getNewGuess;
@@ -13,6 +14,7 @@ window.onload = (e) => {
 let displayTerm = "";
 
 function getNewGuess() {
+    numGuessesUsed = 0;
     const MAX_POKE = 1008;
     let randNum = Math.floor(Math.random() * MAX_POKE);
 
@@ -24,12 +26,11 @@ function getNewGuess() {
     console.log(url);
 
     // 10 - Request data!
-    getData(url);
+    getData(url, pokemonGuessInfo);
 
     console.log("New Pokemon found");
 }
 
-// 3
 function submitButtonClicked() {
     console.log("submitButtonClicked() called");
 
@@ -46,7 +47,7 @@ function submitButtonClicked() {
     // 5 - encode spaces and special characters
     term = encodeURIComponent(term);
 
-    // 6 - if there's no term to serach then bail out the function (return does this)
+    // 6 - if there's no term to search then bail out the function (return does this)
     if (term.length < 1) return;
 
     // 7 - append the search term to the URL
@@ -59,15 +60,20 @@ function submitButtonClicked() {
     console.log(url);
 
     // 10 - Request data!
-    getData(url);
+    getData(url, userGuessInfo);
 }
 
-function getData(url) {
+function getData(url, pokemonInfo) {
     // 1 - create a new XHR object
     let xhr = new XMLHttpRequest();
 
     // 2 - set the onload handler
-    xhr.onload = dataLoaded;
+    if (pokemonInfo == pokemonGuessInfo) {
+        xhr.onload = mainPokemonDataLoaded;
+    }
+    else if (pokemonInfo == userGuessInfo) {
+        xhr.onload = userGuessDataLoaded;
+    }
 
     // 3 - set the onerror handler
     xhr.onerror = dataError;
@@ -77,7 +83,7 @@ function getData(url) {
     xhr.send();
 }
 
-function dataLoaded(e) {
+function mainPokemonDataLoaded(e) {
     // 5 - event.target is the xhr object
     let xhr = e.target;
 
@@ -88,47 +94,136 @@ function dataLoaded(e) {
     let obj = JSON.parse(xhr.responseText);
 
     // 8 - if there are no results, print a message and return
-    if (!obj.data || obj.data.length == 0) {
-        document.querySelector("#status").innerHTML = "<b>No results found for '" + displayTerm + "'</b>";w
+    if (!obj || obj.length == 0) {
+        document.querySelector("#status").innerHTML = "<b>No results found for '" + displayTerm + "'</b>"; w
         return; // Bail out
     }
 
-    // 9 - Start building an HTML string we will display to the user
-    let results = obj.data;
-    console.log("results.length = " + results.length);
-    let bigString = "";
+    if (obj.types.length > 1) {
+        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight, height: obj.height }
+    }
+    else {
+        pokemonGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight, height: obj.height }
+    }
+    console.log(pokemonGuessInfo);
+}
 
-    // 10 - loop through the array of results
-    for (let i = 0; i < results.length; i++) {
-        let result = results[i];
+function userGuessDataLoaded(e) {
+    // 5 - event.target is the xhr object
+    let xhr = e.target;
 
-        // 11 - get the URL to the GIF
-        let smallURL = result.images.fixed_width_downsampled.url;
-        if (!smallURL) smallURL = "images/no-image-found.png";
+    // 6 - xhr.responseText is the JSON file we just downloaded
+    console.log(xhr.responseText);
 
-        // 12 - get the URL to the GIPHY page
-        let url = result.url;
+    // 7 - turn the text into a parsable JavaScript object
+    let obj = JSON.parse(xhr.responseText);
 
-        // 12.5 - get rating
-        let rating = (result.rating ? result.rating : "NA").toUpperCase();
-
-        // 13 - Build a <div> to hold each result
-        // ES6 String Templating
-        let line = `<div class = 'result'>`;
-        line += `<img src='${smallURL}' title='${result.id}' />`;
-        line += `<span><a target='_blank' href='${url}'>View on Giphy</a>`;
-        line += `<p>Rating: ${rating}</p></span>`
-        line += `</div>`;
-
-        // 15 - add the <div> to 'bigString' and loop
-        bigString += line;
+    // 8 - if there are no results, print a message and return
+    if (!obj || obj.length == 0) {
+        document.querySelector("#status").innerHTML = "<b>No results found for '" + displayTerm + "'</b>"; w
+        return; // Bail out
     }
 
-    // 16 - all done building the HTML - show it to the user!
-    document.querySelector("#content").innerHTML = bigString;
+    if (obj.types.length > 1) {
+        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight, height: obj.height }
+    }
+    else {
+        userGuessInfo = { name: obj.name, generation: getGeneration(obj.id), type1: obj.types[0].type.name, type2: null, weight: obj.weight, height: obj.height }
+    }
+    console.log(userGuessInfo);
+    compareData(pokemonGuessInfo, userGuessInfo);
+}
 
-    // 17 - update the status
-    document.querySelector("#status").innerHTML = "<b>Success!</b><p><i>Here are " + results.length + " results for '" + displayTerm + "'</i></p>";
+function getGeneration(id) {
+    if (id > 0 && id <= 151) {
+        return 1;
+    }
+    else if (id > 151 && id <= 251) {
+        return 2;
+    }
+    else if (id > 251 && id <= 386) {
+        return 3;
+    }
+    else if (id > 386 && id <= 493) {
+        return 4;
+    }
+    else if (id > 493 && id <= 649) {
+        return 5;
+    }
+    else if (id > 649 && id <= 721) {
+        return 6;
+    }
+    else if (id > 721 && id <= 809) {
+        return 7;
+    }
+    else if (id > 809 && id <= 905) {
+        return 8;
+    }
+    else if (id > 905 && id <= 1008) {
+        return 9;
+    }
+}
+
+function compareData(mainPokemon, userGuess) {
+
+    numGuessesUsed++;
+    // ES6 String Templating
+    let line = `<div class = 'guess'><ul>`;
+    line += `<li>Guess #${numGuessesUsed}</li>`;
+    line += `<li>Name: ${userGuess.name}</li>`;
+
+    // compare generation numbers
+    if (mainPokemon.generation < userGuess.generation) {
+        line += `<li>Generation: ${userGuess.generation}, Lower</li>`;
+    }
+    else if (mainPokemon.generation > userGuess.generation) {
+        line += `<li>Generation: ${userGuess.generation}, Higher</li>`;
+    }
+    else {
+        line += `<li>Generation: ${userGuess.generation}, Same</li>`;
+    }
+
+    // compare primary types
+    if (mainPokemon.type1 == userGuess.type1) {
+        line += `<li>Primary Type: ${userGuess.type1}, Match</li>`;
+    }
+    else {
+        line += `<li>Primary Type: ${userGuess.type1}, No Match</li>`;
+    }
+
+    // compare secondary types
+    if (mainPokemon.type2 == userGuess.type2) {
+        line += `<li>Secondary Type: ${userGuess.type2}, Match</li>`;
+    }
+    else {
+        line += `<li>Secondary Type: ${userGuess.type2}, No Match</li>`;
+    }
+
+    // compare heights
+    if (mainPokemon.height < userGuess.height) {
+        line += `<li>Height: ${userGuess.height}, Lower</li>`;
+    }
+    else if (mainPokemon.height > userGuess.height) {
+        line += `<li>Height: ${userGuess.height}, Higher</li>`;
+    }
+    else {
+        line += `<li>Height: ${userGuess.height}, Same</li>`;
+    }
+
+    // compare weights
+    if (mainPokemon.weight < userGuess.weight) {
+        line += `<li>Weight: ${userGuess.weight}, Lower</li>`;
+    }
+    else if (mainPokemon.weight > userGuess.weight) {
+        line += `<li>Weight: ${userGuess.weight}, Higher</li>`;
+    }
+    else {
+        line += `<li>Weight: ${userGuess.weight}, Same</li>`;
+    }
+
+    line += `</ul></div>`;
+
+    document.querySelector("#content").innerHTML += line;
 }
 
 function dataError(e) {
