@@ -1,4 +1,5 @@
 const POKE_URL = "https://pokeapi.co/api/v2/pokemon";
+let nationalDex;
 let pokemonGuessInfo; // array for the info of the pokemon to be guessed
 let userGuessInfo; // array for the info of the pokemon the user guesses
 let numGuessesUsed;
@@ -8,9 +9,22 @@ let winStatus;
 // 1
 window.onload = (e) => {
     document.querySelector("#submit").onclick = submitButtonClicked;
+    generateNationalDex();
     getNewGuess();
     document.querySelector("#refresh").onclick = getNewGuess;
 };
+
+function generateNationalDex() {
+    let url = POKE_URL;
+
+    url += "?limit=1008&offset=0";
+
+    // 9 - see what the URL looks like
+    console.log(url);
+
+    // 10 - Request data!
+    getNationalDexData(url);
+}
 
 function getNewGuess() {
     numGuessesUsed = 0;
@@ -29,7 +43,7 @@ function getNewGuess() {
     console.log(url);
 
     // 10 - Request data!
-    getData(url, pokemonGuessInfo);
+    getRandomPokemonData(url);
 
     console.log("New Pokemon found");
 }
@@ -59,20 +73,38 @@ function submitButtonClicked() {
     console.log(url);
 
     // 10 - Request data!
-    getData(url, userGuessInfo);
+    getUserGuessData(url);
 }
 
-function getData(url, pokemonInfo) {
+// function getData(url, pokemonInfo) {
+//     // 1 - create a new XHR object
+//     let xhr = new XMLHttpRequest();
+
+//     // 2 - set the onload handler
+//     if (pokemonInfo == nationalDex) {
+//         xhr.onload = nationalDexLoaded;
+//     }
+//     else if (pokemonInfo == pokemonGuessInfo) {
+//         xhr.onload = mainPokemonDataLoaded;
+//     }
+//     else if (pokemonInfo == userGuessInfo) {
+//         xhr.onload = userGuessDataLoaded;
+//     }
+
+//     // 3 - set the onerror handler
+//     xhr.onerror = dataError;
+
+//     // 4 - open connection and send the request
+//     xhr.open("GET", url);
+//     xhr.send();
+// }
+
+function getNationalDexData(url) {
     // 1 - create a new XHR object
     let xhr = new XMLHttpRequest();
 
     // 2 - set the onload handler
-    if (pokemonInfo == pokemonGuessInfo) {
-        xhr.onload = mainPokemonDataLoaded;
-    }
-    else if (pokemonInfo == userGuessInfo) {
-        xhr.onload = userGuessDataLoaded;
-    }
+    xhr.onload = nationalDexLoaded;
 
     // 3 - set the onerror handler
     xhr.onerror = dataError;
@@ -80,6 +112,61 @@ function getData(url, pokemonInfo) {
     // 4 - open connection and send the request
     xhr.open("GET", url);
     xhr.send();
+}
+
+function getRandomPokemonData(url) {
+    // 1 - create a new XHR object
+    let xhr = new XMLHttpRequest();
+
+    // 2 - set the onload handler
+    xhr.onload = mainPokemonDataLoaded;
+
+    // 3 - set the onerror handler
+    xhr.onerror = dataError;
+
+    // 4 - open connection and send the request
+    xhr.open("GET", url);
+    xhr.send();
+}
+
+function getUserGuessData(url) {
+    // 1 - create a new XHR object
+    let xhr = new XMLHttpRequest();
+
+    // 2 - set the onload handler
+    xhr.onload = userGuessDataLoaded;
+
+    // 3 - set the onerror handler
+    xhr.onerror = dataError;
+
+    // 4 - open connection and send the request
+    xhr.open("GET", url);
+    xhr.send();
+}
+
+function nationalDexLoaded(e) {
+    // 5 - event.target is the xhr object
+    let xhr = e.target;
+
+    // 6 - xhr.responseText is the JSON file we just downloaded
+    console.log(xhr.responseText);
+
+    // 7 - turn the text into a parsable JavaScript object
+    let obj = JSON.parse(xhr.responseText);
+
+    // 8 - if there are no results, print a message and return
+    if (!obj.results || obj.results.length == 0) {
+        console.log("Full dex could not be loaded");
+        return; // Bail out
+    }
+
+    let pokedex = document.querySelector("#pokedex");
+    pokedex.innerHTML = "";
+    for (let i = 0; i < obj.results.length; i++) {
+        pokedex.innerHTML += `<option value=\"${obj.results[i].name}\"></option>`;
+    }
+
+    console.log("National Dex loaded");
 }
 
 function mainPokemonDataLoaded(e) {
@@ -190,20 +277,20 @@ function compareData(mainPokemon, userGuess) {
             line += `<li>Generation: ${userGuess.generation}, Same</li>`;
         }
 
-        // compare primary types
-        if (mainPokemon.type1 == userGuess.type1) {
-            line += `<li>Primary Type: ${userGuess.type1}, Match</li>`;
+        // sees if the first typing of the main pokemon matches with either of the user guess's types
+        if (mainPokemon.type1 == userGuess.type1 || mainPokemon.type1 == userGuess.type2) {
+            line += `<li>Type 1: ${userGuess.type1}, Match</li>`;
         }
         else {
-            line += `<li>Primary Type: ${userGuess.type1}, No Match</li>`;
+            line += `<li>Type 1: ${userGuess.type1}, No Match</li>`;
         }
 
-        // compare secondary types
-        if (mainPokemon.type2 == userGuess.type2) {
-            line += `<li>Secondary Type: ${userGuess.type2}, Match</li>`;
+        // sees if the second typing of the main pokemon matches with either of the user guess's types
+        if (mainPokemon.type2 == userGuess.type2 || mainPokemon.type2 == userGuess.type1) {
+            line += `<li>Type 2: ${userGuess.type2}, Match</li>`;
         }
         else {
-            line += `<li>Secondary Type: ${userGuess.type2}, No Match</li>`;
+            line += `<li>Type 2: ${userGuess.type2}, No Match</li>`;
         }
 
         // compare heights

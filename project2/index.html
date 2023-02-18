@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Who's That Pokemon?</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
     <script src="js/main.js"></script>
 </head>
 
@@ -12,26 +13,28 @@
         <h1>Who's That Pokemon?</h1>
     </header>
 
-    <div class="widgets">
-        Your Guess ->
-        <input id="guessterm" type="text" size="20" maxlength="20" autofocus value="lucario" />
+    <div id="searchBar">
+        <div class="widgets">
+            Your Guess: 
+            <input id="guessterm" type="text" size="20" maxlength="20" placeholder="Guess a pokemon..." list="pokedex"/>
+            <datalist id="pokedex">
+                <!--List is populated on load-->
+            </datalist>
+        </div>
+        <div class="widgets">
+            <button type="button" id="submit" class="green">Make A Guess</button>
+        </div>
+        <div class="widgets">
+            Guesses allowed: 
+            <select id="limit">
+                <option value="7" selected>7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
     </div>
-    <div class="widgets">
-        <button type="button" id="submit" class="green">Make A Guess</button>
-    </div>
-
-
-
-    <div class="widgets">
-        Guesses allowed ->
-        <select id="limit">
-            <option value="5" selected>5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-        </select>
     </div>
 
     <div class="widgets">
