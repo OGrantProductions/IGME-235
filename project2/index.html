@@ -15,8 +15,9 @@
 
     <div id="searchBar">
         <div class="widgets">
-            Your Guess: 
-            <input id="guessterm" type="text" size="20" maxlength="20" placeholder="Guess a pokemon..." list="pokedex"/>
+            Your Guess:
+            <input id="guessterm" type="text" size="20" maxlength="20" placeholder="Guess a pokemon..."
+                list="pokedex" />
             <datalist id="pokedex">
                 <!--List is populated on load-->
             </datalist>
@@ -25,7 +26,7 @@
             <button type="button" id="submit" class="green">Make A Guess</button>
         </div>
         <div class="widgets">
-            Guesses allowed: 
+            Guesses allowed:
             <select id="limit">
                 <option value="7" selected>7</option>
                 <option value="8">8</option>
@@ -34,18 +35,43 @@
                 <option value="11">11</option>
                 <option value="12">12</option>
             </select>
-    </div>
+        </div>
+        <div class="widgets">
+            Generation:
+            <select id="genNumber">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+        </div>
     </div>
 
     <div class="widgets">
         <button type="button" id="refresh" class="green">New Pokemon!<br />:-)</button>
     </div>
+
+    <div id="directions">
+        <h2>Directions:</h2>
+        <p>
+            Welcome to "Who's That Pokemon?"! You will have a certain number of guesses to figure out the random
+            pokemon. If the pokemon you guess matches the random pokemon in a category, that text will be green. If it
+            does not match, that text will be red. For height and weight, if the random pokemon weighs less or is
+            shorter than your guess, the corresponding category will say "lower". If the random pokemon weighs more or
+            is taller than your guess, the corresponding category will say "higher".
+        </p>
+    </div>
+
     <div id="status">Ready to Search!</div>
     <hr>
 
-    <h2>Guesses</h2>
+    <!-- <h2>Guesses</h2> -->
     <div id="content">
-        <p>No data yet!</p>
     </div>
 
 
