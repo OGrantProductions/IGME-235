@@ -1,13 +1,14 @@
 const POKE_URL = "https://pokeapi.co/api/v2/pokemon";
-let nationalDex;
+let pokedex;
 let pokemonGuessInfo; // array for the info of the pokemon to be guessed
 let userGuessInfo; // array for the info of the pokemon the user guesses
-let numGuessesUsed;
-let maxNumGuesses;
-let genNumber;
-let winStatus;
+let numGuessesUsed; // number of guesses used
+let maxNumGuesses; // max guesses allowed
+let genNumber; // generation number
+let winStatus; // variable to check if you've won that the player can't keep going after
+let dexStart; // the number that dex is starting with
+let dexLimit; // the number of pokemon in that generation
 
-// 1
 window.onload = (e) => {
     document.querySelector("#submit").onclick = submitButtonClicked;
     // Saves the previous search term to redisplay when the user comes back to the page on the same browser
@@ -23,30 +24,30 @@ window.onload = (e) => {
     }
     guessField.onchange = e => { localStorage.setItem(guessKey, e.target.value); };
 
-    generateNationalDex();
     getNewGuess();
     document.querySelector("#refresh").onclick = getNewGuess;
     document.querySelector("#limit").onchange = getNewGuess;
     document.querySelector("#genNumber").onchange = getNewGuess;
 };
 
-function generateNationalDex() {
+function generatePokedex() {
     let url = POKE_URL;
 
-    url += "?limit=1008&offset=0";
+    url += "?limit=" + dexLimit + "&offset=" + dexStart;
 
-    // 9 - see what the URL looks like
+    // see what the URL looks like
     console.log(url);
 
-    // 10 - Request data!
-    getNationalDexData(url);
+    // Request data!
+    getPokedexData(url);
 }
 
 function getNewGuess() {
     numGuessesUsed = 0;
+    pokedex = [];
     winStatus = false;
     maxNumGuesses = document.querySelector("#limit").value;
-    genNum = document.querySelector("#genNumber").value;
+    genNumber = document.querySelector("#genNumber").value;
     document.querySelector("#content").innerHTML = `<div class="guess">
     <div class="guessItem">Sprite</div>
     <div class="guessItem">Name:</div>
@@ -55,8 +56,8 @@ function getNewGuess() {
     <div class="guessItem">Height:</div>
     <div class="guessItem">Weight:</div></div>`;
     document.querySelector("#status").innerHTML = `<b>You have ${maxNumGuesses} guesses Left!</b>`;
-    let randNum = getRandIdByGen(genNum);
-
+    let randNum = getRandIdByGen(genNumber);
+    generatePokedex();
     let url = POKE_URL;
 
     url += "/" + randNum + "/";
@@ -70,40 +71,61 @@ function getNewGuess() {
     console.log("New Pokemon found");
 }
 
+// function for checking if the user's search term is a valid entry
+function checkInDex(term, pokedex) {
+    let termInList = false;
+    for (let i = 0; i < pokedex.length; i++) {
+        if (term == pokedex[i]) {
+            termInList = true;
+        }
+    }
+    return termInList;
+}
+
 function submitButtonClicked() {
     console.log("submitButtonClicked() called");
 
-    // 2 - build up our URL string
+    // build up our URL string
     let url = POKE_URL;
 
-    // 3 - parse the user entered term we wish to search
+    // parse the user entered term we wish to search
     let term = document.querySelector("#guessterm").value;
 
-    // 4 - get rid of any leading and trailing spaces
+    if (term == "") {
+        document.querySelector("#status").innerHTML = `<b>No guess given. Please enter a pokemon name.</b>`;
+        return;
+    }
+    else if (!checkInDex(term, pokedex)) {
+        document.querySelector("#status").innerHTML = `<b>Entry not found in list. Please check your entry.</b>`;
+        return;
+    }
+
+    // get rid of any leading and trailing spaces
     term = term.trim();
 
-    // 5 - encode spaces and special characters
+    // encode spaces and special characters
     term = encodeURIComponent(term);
 
-    // 6 - if there's no term to search then bail out the function (return does this)
+    // if there's no term to search then bail out the function (return does this)
     if (term.length < 1) return;
 
-    // 7 - append the search term to the URL
+    // append the search term to the URL
     url += "/" + term + "/";
 
-    // 9 - see what the URL looks like
+    // see what the URL looks like
     console.log(url);
 
-    // 10 - Request data!
+    // Request data!
     getUserGuessData(url);
 }
 
-function getNationalDexData(url) {
+// tried to consolodate these getData functions into one but ran into issues of the wrong one's being called sometimes and wasn't sure how to fix
+function getPokedexData(url) {
     // 1 - create a new XHR object
     let xhr = new XMLHttpRequest();
 
     // 2 - set the onload handler
-    xhr.onload = nationalDexLoaded;
+    xhr.onload = pokedexLoaded;
 
     // 3 - set the onerror handler
     xhr.onerror = dataError;
@@ -143,7 +165,7 @@ function getUserGuessData(url) {
     xhr.send();
 }
 
-function nationalDexLoaded(e) {
+function pokedexLoaded(e) {
     // 5 - event.target is the xhr object
     let xhr = e.target;
 
@@ -159,10 +181,11 @@ function nationalDexLoaded(e) {
         return; // Bail out
     }
 
-    let pokedex = document.querySelector("#pokedex");
-    pokedex.innerHTML = "";
+    let pokedexList = document.querySelector("#pokedex");
+    pokedexList.innerHTML = "";
     for (let i = 0; i < obj.results.length; i++) {
-        pokedex.innerHTML += `<option value=\"${obj.results[i].name}\"></option>`;
+        pokedexList.innerHTML += `<option value=\"${obj.results[i].name}\"></option>`;
+        pokedex.push(obj.results[i].name);
     }
 
     console.log("National Dex loaded");
@@ -178,17 +201,11 @@ function mainPokemonDataLoaded(e) {
     // 7 - turn the text into a parsable JavaScript object
     let obj = JSON.parse(xhr.responseText);
 
-    // 8 - if there are no results, print a message and return
-    if (!obj || obj.length == 0) {
-        document.querySelector("#status").innerHTML = "<b>No results found for '" + displayTerm + "'</b>"; w
-        return; // Bail out
-    }
-
     if (obj.types.length > 1) {
-        pokemonGuessInfo = { name: obj.name, type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 }
+        pokemonGuessInfo = { name: obj.name, type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 };
     }
     else {
-        pokemonGuessInfo = { name: obj.name, type1: obj.types[0].type.name, type2: null, weight: obj.weight / 10, height: obj.height / 10 }
+        pokemonGuessInfo = { name: obj.name, type1: obj.types[0].type.name, type2: "----", weight: obj.weight / 10, height: obj.height / 10 };
     }
     console.log(pokemonGuessInfo);
 }
@@ -203,68 +220,80 @@ function userGuessDataLoaded(e) {
     // 7 - turn the text into a parsable JavaScript object
     let obj = JSON.parse(xhr.responseText);
 
-    // 8 - if there are no results, print a message and return
-    if (!obj || obj.length == 0) {
-        document.querySelector("#status").innerHTML = "<b>No results found for '" + displayTerm + "'</b>"; w
-        return; // Bail out
-    }
-
     if (obj.types.length > 1) {
-        userGuessInfo = { name: obj.name, artwork: obj.sprites.front_default, type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 }
+        userGuessInfo = { name: obj.name, artwork: obj.sprites.front_default, type1: obj.types[0].type.name, type2: obj.types[1].type.name, weight: obj.weight / 10, height: obj.height / 10 };
     }
     else {
-        userGuessInfo = { name: obj.name, artwork: obj.sprites.front_default, type1: obj.types[0].type.name, type2: "----", weight: obj.weight / 10, height: obj.height / 10 }
+        userGuessInfo = { name: obj.name, artwork: obj.sprites.front_default, type1: obj.types[0].type.name, type2: "----", weight: obj.weight / 10, height: obj.height / 10 };
     }
     console.log(userGuessInfo);
     compareData(pokemonGuessInfo, userGuessInfo);
 }
 
-// Determine the generation of the pokemon based on their ID
+// Determine the Id of the pokemon based on selected generation
 function getRandIdByGen(gen) {
     let randNum;
     if (gen == 1) {
         randNum = Math.floor(Math.random() * (152 - 1) + 1);
         console.log(randNum);
+        dexStart = 0;
+        dexLimit = 151;
         return randNum;
     }
     else if (gen == 2) {
         randNum = Math.floor(Math.random() * (252 - 152) + 152);
         console.log(randNum);
+        dexStart = 151;
+        dexLimit = 100;
         return randNum;
     }
     else if (gen == 3) {
         randNum = Math.floor(Math.random() * (387 - 252) + 252);
         console.log(randNum);
+        dexStart = 251;
+        dexLimit = 135;
         return randNum;
     }
     else if (gen == 4) {
         randNum = Math.floor(Math.random() * (494 - 387) + 387);
         console.log(randNum);
+        dexStart = 386;
+        dexLimit = 107;
         return randNum;
     }
     else if (gen == 5) {
         randNum = Math.floor(Math.random() * (650 - 494) + 494);
         console.log(randNum);
+        dexStart = 493;
+        dexLimit = 156;
         return randNum;
     }
     else if (gen == 6) {
         randNum = Math.floor(Math.random() * (722 - 650) + 650);
         console.log(randNum);
+        dexStart = 649;
+        dexLimit = 72;
         return randNum;
     }
     else if (gen == 7) {
         randNum = Math.floor(Math.random() * (810 - 722) + 722);
         console.log(randNum);
+        dexStart = 721;
+        dexLimit = 88;
         return randNum;
     }
     else if (gen == 8) {
         randNum = Math.floor(Math.random() * (906 - 810) + 810);
         console.log(randNum);
+        dexStart = 809;
+        dexLimit = 96;
         return randNum;
     }
     else if (gen == 9) {
         randNum = Math.floor(Math.random() * (1009 - 906) + 906);
         console.log(randNum);
+        dexStart = 905;
+        dexLimit = 103;
         return randNum;
     }
 }
@@ -280,7 +309,7 @@ function compareData(mainPokemon, userGuess) {
     else {
         numGuessesUsed++;
         let numGuessesLeft = maxNumGuesses - numGuessesUsed;
-        let line = `<div class="guess">`
+        let line = `<div class="guess">`;
         line += `<div class="guessItem"><img src="${userGuess.artwork}" alt="${userGuess.name} artwork"></div>`;
         line += `<div class="guessItem">${userGuess.name}</div>`;
 
@@ -308,7 +337,7 @@ function compareData(mainPokemon, userGuess) {
             line += `<div class="guessItem" style="color:red;">${userGuess.height}m <br> Higher</div>`;
         }
         else {
-            line += `<div class="guessItem" style="color:green;">${userGuess.height}</div>`;
+            line += `<div class="guessItem" style="color:green;">${userGuess.height}m</div>`;
         }
 
         // compare weights
