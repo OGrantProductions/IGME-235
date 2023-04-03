@@ -3,7 +3,8 @@
 "use strict";
 const app = new PIXI.Application({
     width: 1000,
-    height: 1000
+    height: 600,
+    backgroundImage: "images/spaceBackground.jpg"
 });
 document.body.appendChild(app.view);
 
@@ -16,16 +17,18 @@ app.loader.
     add([
         "images/earth.png",
         "images/meteor.png",
-        "images/spaceship.png"
+        "images/spaceship.png",
+        "images/spaceBackground.jpg"
     ]);
 app.loader.onProgress.add(e => { console.log(`progress=${e.progress}`) });
-app.loader.onComplete.add(setup);
+app.loader.onComplete.add(setupGame);
 app.loader.load();
 
 // aliases
 let stage;
 
 // game variables
+let background;
 let startScene;
 let instructionsScene;
 let gameScene, ship, planet, scoreLabel, earthHealthLabel, shipHealthLabel;
@@ -72,6 +75,13 @@ function setupGame(){
     gameOverScene.visible = false;
     stage.addChild(gameOverScene);
 
+    background = new BackgroundImage();
+    startScene.addChild(background);
+    instructionsScene.addChild(background);
+    gameScene.addChild(background);
+    upgradeScene.addChild(background);
+    gameOverScene.addChild(background);
+
     createLabelsAndButtons();
 }
 
@@ -82,39 +92,40 @@ function createLabelsAndButtons(){
         fontFamily: "Futura"
     });
 
-    // 1 - set up 'startScene'
-    // 1A - make top start label
-    let startLabel1 = new PIXI.Text("Circle Blast!");
-    startLabel1.style = new PIXI.TextStyle({
+    // set up 'startScene'
+    // make title
+    let title = new PIXI.Text("Protect the Planet");
+    title.style = new PIXI.TextStyle({
         fill: 0xFFFFFF,
-        fontSize: 96,
+        fontSize: 120,
         fontFamily: "Futura",
         stroke: 0xFF0000,
         strokeThickness: 6
     });
-    startLabel1.x = 50;
-    startLabel1.y = 120;
-    startScene.addChild(startLabel1);
+    title.x = sceneWidth/2;
+    title.y = 200;
+    title.anchor.set(0.5);
+    startScene.addChild(title);
 
-    // 1B - make middle start label
-    let startLabel2 = new PIXI.Text("R U Worthy..?");
-    startLabel2.style = new PIXI.TextStyle({
-        fill: 0xFFFFFF,
-        fontSize: 32,
-        fontFamily: "Futura",
-        fontStyle: "italic",
-        stroke: 0xFF0000,
-        strokeThickness: 6
-    });
-    startLabel2.x = 185;
-    startLabel2.y = 300;
-    startScene.addChild(startLabel2);
+    // make instructions button
+    let instructionsButton = new PIXI.Text("How to Play");
+    instructionsButton.style = buttonStyle;
+    instructionsButton.x = sceneWidth/2;
+    instructionsButton.y = sceneHeight - 200;
+    instructionsButton.anchor.set(0.5);
+    instructionsButton.interactive = true;
+    instructionsButton.buttonMode = true;
+    instructionsButton.on("pointerup", moveToInstructions); // startGame is a function reference
+    instructionsButton.on('pointerover', e => e.target.alpha = 0.7); // concise arrow function with no brackets
+    instructionsButton.on('pointerout', e => e.currentTarget.alpha = 1.0); // ditto
+    startScene.addChild(instructionsButton);
 
-    // 1C - make start game button
-    let startButton = new PIXI.Text("Enter, ... if you dare!");
+    // make start game button
+    let startButton = new PIXI.Text("Start Game");
     startButton.style = buttonStyle;
-    startButton.x = 80;
+    startButton.x = sceneWidth/2;
     startButton.y = sceneHeight - 100;
+    startButton.anchor.set(0.5);
     startButton.interactive = true;
     startButton.buttonMode = true;
     startButton.on("pointerup", startGame); // startGame is a function reference
@@ -148,7 +159,8 @@ function moveToUpgrades(){
 }
 
 function moveToInstructions(){
-
+    paused = true;
+    instructionsScene.visible = true;
 }
 
 function backToGame(){
