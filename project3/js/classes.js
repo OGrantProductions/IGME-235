@@ -28,7 +28,7 @@ class Meteor extends PIXI.Sprite {
     }
 }
 
-class Bullet extends PIXI.Graphics {
+class Laser extends PIXI.Graphics {
     constructor(color = 0xFFFFFF, x = 0, y = 0) {
         super();
         this.beginFill(color);
