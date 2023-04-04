@@ -48,14 +48,3 @@ class Laser extends PIXI.Graphics {
         this.y += this.fwd.y * this.speed * dt;
     }
 }
-
-class BackgroundImage extends PIXI.Sprite {
-    constructor(x = 0, y = 0, width = sceneWidth, height = sceneHeight) {
-        super(app.loader.resources["images/spaceBackground.jpg"].texture);
-        this.anchor.set(0, 0);
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-}

@@ -2,7 +2,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 "use strict";
 const app = new PIXI.Application({
-    width: 1000,
+    width: 950,
     height: 600,
     backgroundImage: "images/spaceBackground.jpg"
 });
@@ -28,13 +28,14 @@ app.loader.load();
 let stage;
 
 // game variables
-let background;
 let startScene;
 let instructionsScene;
 let gameScene, ship, planet, scoreLabel, earthHealthLabel, shipHealthLabel;
 let pauseScene;
 let upgradeScene;
 let gameOverScene, gameOverScoreLabel;
+
+let currentScene;
 
 let meteors = [];
 let lasers = [];
@@ -44,11 +45,27 @@ let shipHealth = 100;
 let waveNum = 1;
 let paused = true;
 
-function setupGame(){
+function setupGame() {
     stage = app.stage;
+
+    // create background for every scene
+    const background = new PIXI.Sprite(app.loader.resources["images/spaceBackground.jpg"].texture);
+    background.width = sceneWidth;
+    background.height = sceneHeight;
+    stage.addChild(background);
+
     // create the `start` scene
     startScene = new PIXI.Container();
+    currentScene = startScene;
+    startScene.name = "start scene"
     stage.addChild(startScene);
+
+    // // create all the other scenes
+    // createScene(instructionsScene);
+    // createScene(gameScene);
+    // createScene(pauseScene);
+    // createScene(upgradeScene);
+    // createScene(gameOverScene);
 
     // Create the `instructions` scene and make it invisible
     instructionsScene = new PIXI.Container();
@@ -75,18 +92,23 @@ function setupGame(){
     gameOverScene.visible = false;
     stage.addChild(gameOverScene);
 
-    background = new BackgroundImage();
-    startScene.addChild(background);
-    instructionsScene.addChild(background);
-    gameScene.addChild(background);
-    upgradeScene.addChild(background);
-    gameOverScene.addChild(background);
-
+    // Create the labels and buttons for all of the scenes
     createLabelsAndButtons();
+
+    // Create ship
+    ship = new Ship();
+    gameScene.addChild(ship);
 }
 
-function createLabelsAndButtons(){
-    let buttonStyle = new PIXI.TextStyle({
+// function createScene(scene) {
+//     scene = new PIXI.Container();
+//     scene.visible = false;
+//     scene.name = `${scene}`;
+//     stage.addChild(scene);
+// }
+
+function createLabelsAndButtons() {
+    let menuButtonStyle = new PIXI.TextStyle({
         fill: 0xFF0000,
         fontSize: 48,
         fontFamily: "Futura"
@@ -102,40 +124,92 @@ function createLabelsAndButtons(){
         stroke: 0xFF0000,
         strokeThickness: 6
     });
-    title.x = sceneWidth/2;
+    title.x = sceneWidth / 2;
     title.y = 200;
     title.anchor.set(0.5);
     startScene.addChild(title);
 
     // make instructions button
     let instructionsButton = new PIXI.Text("How to Play");
-    instructionsButton.style = buttonStyle;
-    instructionsButton.x = sceneWidth/2;
+    instructionsButton.style = menuButtonStyle;
+    instructionsButton.x = sceneWidth / 2;
     instructionsButton.y = sceneHeight - 200;
     instructionsButton.anchor.set(0.5);
     instructionsButton.interactive = true;
     instructionsButton.buttonMode = true;
-    instructionsButton.on("pointerup", moveToInstructions); // startGame is a function reference
-    instructionsButton.on('pointerover', e => e.target.alpha = 0.7); // concise arrow function with no brackets
-    instructionsButton.on('pointerout', e => e.currentTarget.alpha = 1.0); // ditto
+    instructionsButton.on("click", () => { switchScenes(instructionsScene) }); // when button is clicked
+    instructionsButton.on('pointerover', e => e.target.alpha = 0.7); // when button is hovered over
+    instructionsButton.on('pointerout', e => e.currentTarget.alpha = 1.0); // when button isn't hovered over
     startScene.addChild(instructionsButton);
+
+    // make 'back to start button' from instructions
+    let instructBack = new PIXI.Text("Back to Start");
+    instructBack.style = menuButtonStyle;
+    instructBack.x = sceneWidth / 2;
+    instructBack.y = sceneHeight - 200;
+    instructBack.anchor.set(0.5);
+    instructBack.interactive = true;
+    instructBack.buttonMode = true;
+    instructBack.on("click", () => { switchScenes(startScene) });
+    instructBack.on('pointerover', e => e.target.alpha = 0.7);
+    instructBack.on('pointerout', e => e.currentTarget.alpha = 1.0);
+    instructionsScene.addChild(instructBack);
 
     // make start game button
     let startButton = new PIXI.Text("Start Game");
-    startButton.style = buttonStyle;
-    startButton.x = sceneWidth/2;
+    startButton.style = menuButtonStyle;
+    startButton.x = sceneWidth / 2;
     startButton.y = sceneHeight - 100;
     startButton.anchor.set(0.5);
     startButton.interactive = true;
     startButton.buttonMode = true;
-    startButton.on("pointerup", startGame); // startGame is a function reference
-    startButton.on('pointerover', e => e.target.alpha = 0.7); // concise arrow function with no brackets
-    startButton.on('pointerout', e => e.currentTarget.alpha = 1.0); // ditto
+    startButton.on("click", startGame);
+    startButton.on('pointerover', e => e.target.alpha = 0.7);
+    startButton.on('pointerout', e => e.currentTarget.alpha = 1.0);
     startScene.addChild(startButton);
+
+    // game scene
+    let gameLabelStyle = new PIXI.TextStyle({
+        fill: 0xFFFFFF,
+        fontSize: 18,
+        fontFamily: "Futura",
+        stroke: 0xFF0000,
+        strokeThickness: 4
+    })
+
+    // make score label
+    scoreLabel = new PIXI.Text();
+    scoreLabel.style = gameLabelStyle;
+    scoreLabel.x = 5;
+    scoreLabel.y = 5;
+    gameScene.addChild(scoreLabel);
+    increaseScoreBy(0);
+
+    // make life label
+    earthHealthLabel = new PIXI.Text();
+    earthHealthLabel.style = gameLabelStyle;
+    earthHealthLabel.x = 5;
+    earthHealthLabel.y = 26;
+    gameScene.addChild(earthHealthLabel);
+    decreaseHealthBy(0);
 }
 
-function startGame(){
+function startGame() {
+    switchScenes(gameScene);
+    score = 0;
+    earthHealth = 100;
+    waveNum = 1;
+    increaseScoreBy(0);
+    decreaseHealthBy(0);
+    ship.x = 300;
+    ship.y = 550;
+}
 
+function switchScenes(scene) {
+    currentScene.visible = false;
+    paused = true;
+    scene.visible = true;
+    currentScene = scene;
 }
 
 function increaseScoreBy(value) {
@@ -146,31 +220,26 @@ function increaseScoreBy(value) {
 function decreaseHealthBy(value) {
     earthHealth -= value;
     earthHealth = parseInt(earthHealth);
+    earthHealthLabel.text = `Earth Health  ${earthHealth}`;
 }
 
-function createMeteors(){
+function createMeteors(numMeteors) {
 
 }
 
-function moveToUpgrades(){
+function sendWave(){
+    createMeteors(waveNum * 5);
     paused = true;
-    upgradeScene.visible = true;
-    
 }
 
-function moveToInstructions(){
-    paused = true;
-    instructionsScene.visible = true;
-}
-
-function backToGame(){
+function backToGame() {
 
 }
 
-function gameOver(){
+function gameOver() {
 
 }
 
-function fireLaser(e){
+function fireLaser(e) {
 
 }
