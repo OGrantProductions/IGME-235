@@ -30,7 +30,7 @@ let stage;
 // game variables
 let startScene;
 let instructionsScene;
-let gameScene, ship, planet, scoreLabel, earthHealthLabel, shipHealthLabel;
+let gameScene, ship, earth, scoreLabel, earthHealthLabel, shipHealthLabel;
 let pauseScene;
 let upgradeScene;
 let gameOverScene, gameOverScoreLabel;
@@ -98,6 +98,10 @@ function setupGame() {
     // Create ship
     ship = new Ship();
     gameScene.addChild(ship);
+
+    // Create planet
+    earth = new Planet();
+    gameScene.addChild(earth);
 }
 
 // function createScene(scene) {
@@ -109,7 +113,7 @@ function setupGame() {
 
 function createLabelsAndButtons() {
     let menuButtonStyle = new PIXI.TextStyle({
-        fill: 0xFF0000,
+        fill: 0xFFFFFF,
         fontSize: 48,
         fontFamily: "Futura"
     });
@@ -118,11 +122,11 @@ function createLabelsAndButtons() {
     // make title
     let title = new PIXI.Text("Protect the Planet");
     title.style = new PIXI.TextStyle({
-        fill: 0xFFFFFF,
+        fill: 0x5D3FD3,
         fontSize: 120,
         fontFamily: "Futura",
-        stroke: 0xFF0000,
-        strokeThickness: 6
+        stroke: 0xFFFFFF,
+        strokeThickness: 10
     });
     title.x = sceneWidth / 2;
     title.y = 200;
@@ -170,10 +174,10 @@ function createLabelsAndButtons() {
 
     // game scene
     let gameLabelStyle = new PIXI.TextStyle({
-        fill: 0xFFFFFF,
-        fontSize: 18,
+        fill: 0x5D3FD3,
+        fontSize: 36,
         fontFamily: "Futura",
-        stroke: 0xFF0000,
+        stroke: 0xFFFFFF,
         strokeThickness: 4
     })
 
@@ -188,8 +192,9 @@ function createLabelsAndButtons() {
     // make life label
     earthHealthLabel = new PIXI.Text();
     earthHealthLabel.style = gameLabelStyle;
-    earthHealthLabel.x = 5;
-    earthHealthLabel.y = 26;
+    earthHealthLabel.anchor.set(1, 0);
+    earthHealthLabel.x = 945;
+    earthHealthLabel.y = 5;
     gameScene.addChild(earthHealthLabel);
     decreaseHealthBy(0);
 }
@@ -201,8 +206,10 @@ function startGame() {
     waveNum = 1;
     increaseScoreBy(0);
     decreaseHealthBy(0);
-    ship.x = 300;
-    ship.y = 550;
+    ship.x = sceneWidth/2;
+    ship.y = sceneHeight/2;
+    earth.x = sceneWidth/2;
+    earth.y = 400;
 }
 
 function switchScenes(scene) {
