@@ -1,10 +1,12 @@
+// Resources
+// https://github.com/kittykatattack/learningPixi
+
 // We will use `strict mode`, which helps us by having the browser catch many common JS mistakes
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 "use strict";
 const app = new PIXI.Application({
     width: 950,
-    height: 600,
-    backgroundImage: "images/spaceBackground.jpg"
+    height: 600
 });
 document.body.appendChild(app.view);
 
@@ -60,13 +62,6 @@ function setupGame() {
     startScene.name = "start scene"
     stage.addChild(startScene);
 
-    // // create all the other scenes
-    // createScene(instructionsScene);
-    // createScene(gameScene);
-    // createScene(pauseScene);
-    // createScene(upgradeScene);
-    // createScene(gameOverScene);
-
     // Create the `instructions` scene and make it invisible
     instructionsScene = new PIXI.Container();
     instructionsScene.visible = false;
@@ -103,13 +98,6 @@ function setupGame() {
     earth = new Planet();
     gameScene.addChild(earth);
 }
-
-// function createScene(scene) {
-//     scene = new PIXI.Container();
-//     scene.visible = false;
-//     scene.name = `${scene}`;
-//     stage.addChild(scene);
-// }
 
 function createLabelsAndButtons() {
     let menuButtonStyle = new PIXI.TextStyle({
@@ -210,6 +198,17 @@ function startGame() {
     ship.y = sceneHeight/2;
     earth.x = sceneWidth/2;
     earth.y = 400;
+}
+
+function gameLoop(){
+    // Calculate "delta time"
+    let dt = 1 / app.ticker.FPS;
+    if (dt > 1 / 12) dt = 1 / 12;
+
+    // Player movement
+    // https://www.youtube.com/watch?v=cP-_beFbz_Q
+    // https://www.npmjs.com/package/pixi.js-keyboard
+    // https://www.html5gamedevs.com/topic/11231-keyboard-events/
 }
 
 function switchScenes(scene) {
