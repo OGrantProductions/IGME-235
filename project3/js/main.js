@@ -17,8 +17,7 @@ window.addEventListener("keyup", keysUp);
 let keys = {};
 let keysDiv;
 
-// w - 87, a - 65, s - 83, d - 68
-// up - 38, left - 37, down - 40, right - 39
+
 
 // constants
 const sceneWidth = app.view.width;
@@ -234,13 +233,32 @@ function gameLoop() {
     // https://www.youtube.com/watch?v=cP-_beFbz_Q
     // https://www.npmjs.com/package/pixi.js-keyboard
     // https://www.html5gamedevs.com/topic/11231-keyboard-events/
+    playerInput();
 
 
 }
 
+// method to handle any player input
 function playerInput() {
-    switch(keyInput){
-        case keys[""]:
+    // 'w' or up arrow
+    if (keys["87"] || keys["38"]) {
+        ship.y -= 5;
+    }
+    // 'a' or left arrow
+    if (keys["65"] || keys["37"]) {
+        ship.x -= 5;
+    }
+    // 's' or down arrow
+    if (keys["83"] || keys["40"]) {
+        ship.y += 5;
+    }
+    // 'd' or right arrow
+    if (keys["68"] || keys["39"]) {
+        ship.x += 5;
+    }
+    // 'space' or mouse click
+    if (keys["32"]){
+        fireLaser();
     }
 }
 
