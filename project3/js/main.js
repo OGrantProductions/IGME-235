@@ -1,5 +1,6 @@
 // Resources
 // https://github.com/kittykatattack/learningPixi
+// Keyboard Movement Tutorial by Dower Chin - https://www.youtube.com/watch?v=cP-_beFbz_Q
 
 // We will use `strict mode`, which helps us by having the browser catch many common JS mistakes
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
@@ -9,6 +10,15 @@ const app = new PIXI.Application({
     height: 600
 });
 document.body.appendChild(app.view);
+
+// keyboard event handlers
+window.addEventListener("keydown", keysDown);
+window.addEventListener("keyup", keysUp);
+let keys = {};
+let keysDiv;
+
+// w - 87, a - 65, s - 83, d - 68
+// up - 38, left - 37, down - 40, right - 39
 
 // constants
 const sceneWidth = app.view.width;
@@ -25,6 +35,7 @@ app.loader.
 app.loader.onProgress.add(e => { console.log(`progress=${e.progress}`) });
 app.loader.onComplete.add(setupGame);
 app.loader.load();
+
 
 // aliases
 let stage;
@@ -46,6 +57,17 @@ let earthHealth = 100;
 let shipHealth = 100;
 let waveNum = 1;
 let paused = true;
+
+function keysDown(e) {
+    console.log(e.keyCode);
+    keys[e.keyCode] = true;
+}
+
+function keysUp(e) {
+    console.log(e.keyCode);
+    keys[e.keyCode] = false;
+}
+
 
 function setupGame() {
     stage = app.stage;
@@ -97,6 +119,9 @@ function setupGame() {
     // Create planet
     earth = new Planet();
     gameScene.addChild(earth);
+
+    // Start update loop
+    app.ticker.add(gameLoop);
 }
 
 function createLabelsAndButtons() {
@@ -194,13 +219,13 @@ function startGame() {
     waveNum = 1;
     increaseScoreBy(0);
     decreaseHealthBy(0);
-    ship.x = sceneWidth/2;
-    ship.y = sceneHeight/2;
-    earth.x = sceneWidth/2;
+    ship.x = sceneWidth / 2;
+    ship.y = sceneHeight / 2;
+    earth.x = sceneWidth / 2;
     earth.y = 400;
 }
 
-function gameLoop(){
+function gameLoop() {
     // Calculate "delta time"
     let dt = 1 / app.ticker.FPS;
     if (dt > 1 / 12) dt = 1 / 12;
@@ -209,6 +234,14 @@ function gameLoop(){
     // https://www.youtube.com/watch?v=cP-_beFbz_Q
     // https://www.npmjs.com/package/pixi.js-keyboard
     // https://www.html5gamedevs.com/topic/11231-keyboard-events/
+
+
+}
+
+function playerInput() {
+    switch(keyInput){
+        case keys[""]:
+    }
 }
 
 function switchScenes(scene) {
@@ -233,7 +266,7 @@ function createMeteors(numMeteors) {
 
 }
 
-function sendWave(){
+function sendWave() {
     createMeteors(waveNum * 5);
     paused = true;
 }
