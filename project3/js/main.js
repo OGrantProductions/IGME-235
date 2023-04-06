@@ -42,7 +42,7 @@ let stage;
 // game variables
 let startScene;
 let instructionsScene;
-let gameScene, ship, earth, scoreLabel, earthHealthLabel, shipHealthLabel;
+let gameScene, ship, earth, scoreLabel, waveLabel, earthHealthLabel, shipLivesLabel;
 let pauseScene;
 let upgradeScene;
 let gameOverScene, gameOverScoreLabel;
@@ -50,10 +50,10 @@ let gameOverScene, gameOverScoreLabel;
 let currentScene;
 
 let meteors = [];
-let lasers = [];
+let bullets = [];
 let score = 0;
 let earthHealth = 100;
-let shipHealth = 100;
+let shipLives = 3;
 let waveNum = 1;
 let paused = true;
 
@@ -67,7 +67,7 @@ function keysUp(e) {
     keys[e.keyCode] = false;
 }
 
-
+// Sets up all of the scenes, labels, and assets needed for the game
 function setupGame() {
     stage = app.stage;
 
@@ -123,6 +123,7 @@ function setupGame() {
     app.ticker.add(gameLoop);
 }
 
+// Makes all of the labels and buttons for every scene so they're already available when needed
 function createLabelsAndButtons() {
     let menuButtonStyle = new PIXI.TextStyle({
         fill: 0xFFFFFF,
@@ -130,7 +131,10 @@ function createLabelsAndButtons() {
         fontFamily: "Futura"
     });
 
+    //
     // set up 'startScene'
+    //
+
     // make title
     let title = new PIXI.Text("Protect the Planet");
     title.style = new PIXI.TextStyle({
@@ -158,19 +162,6 @@ function createLabelsAndButtons() {
     instructionsButton.on('pointerout', e => e.currentTarget.alpha = 1.0); // when button isn't hovered over
     startScene.addChild(instructionsButton);
 
-    // make 'back to start button' from instructions
-    let instructBack = new PIXI.Text("Back to Start");
-    instructBack.style = menuButtonStyle;
-    instructBack.x = sceneWidth / 2;
-    instructBack.y = sceneHeight - 200;
-    instructBack.anchor.set(0.5);
-    instructBack.interactive = true;
-    instructBack.buttonMode = true;
-    instructBack.on("click", () => { switchScenes(startScene) });
-    instructBack.on('pointerover', e => e.target.alpha = 0.7);
-    instructBack.on('pointerout', e => e.currentTarget.alpha = 1.0);
-    instructionsScene.addChild(instructBack);
-
     // make start game button
     let startButton = new PIXI.Text("Start Game");
     startButton.style = menuButtonStyle;
@@ -184,7 +175,56 @@ function createLabelsAndButtons() {
     startButton.on('pointerout', e => e.currentTarget.alpha = 1.0);
     startScene.addChild(startButton);
 
-    // game scene
+    //
+    // set up 'instructionsScene'
+    //
+
+    // make instructions title
+    let instructionsTitle = new PIXI.Text("How to Play");
+    instructionsTitle.style = new PIXI.TextStyle({
+        fill: 0x5D3FD3,
+        fontSize: 90,
+        fontFamily: "Futura",
+        stroke: 0xFFFFFF,
+        strokeThickness: 10
+    });
+    instructionsTitle.x = sceneWidth / 2;
+    instructionsTitle.y = 75;
+    instructionsTitle.anchor.set(0.5);
+    instructionsScene.addChild(instructionsTitle);
+
+    // make instructions
+    let instructions = new PIXI.Text("You are responsible for protecting the planet from an\nincoming meteor shower as long as possible.\nYou control your ship using WASD or the arrow keys.\nFire bullets using the left mouse button.\nLast as long as possible and protect your planet!");
+    instructions.style = new PIXI.TextStyle({
+        fill: 0x5D3FD3,
+        fontSize: 40,
+        fontFamily: "Futura",
+        stroke: 0x000000,
+        strokeThickness: 15,
+        align: "center"
+    });
+    instructions.x = sceneWidth / 2;
+    instructions.y = sceneHeight / 2;
+    instructions.anchor.set(0.5);
+    instructionsScene.addChild(instructions);
+
+    // make 'back to start button' from instructions
+    let instructBack = new PIXI.Text("Back to Start");
+    instructBack.style = menuButtonStyle;
+    instructBack.x = sceneWidth / 2;
+    instructBack.y = sceneHeight - 75;
+    instructBack.anchor.set(0.5);
+    instructBack.interactive = true;
+    instructBack.buttonMode = true;
+    instructBack.on("click", () => { switchScenes(startScene) });
+    instructBack.on('pointerover', e => e.target.alpha = 0.7);
+    instructBack.on('pointerout', e => e.currentTarget.alpha = 1.0);
+    instructionsScene.addChild(instructBack);
+
+    //
+    // set up 'gameScene'
+    //
+
     let gameLabelStyle = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 36,
@@ -201,45 +241,186 @@ function createLabelsAndButtons() {
     gameScene.addChild(scoreLabel);
     increaseScoreBy(0);
 
-    // make life label
+    // make wave label
+    waveLabel = new PIXI.Text();
+    waveLabel.style = gameLabelStyle;
+    waveLabel.anchor.set(0.5, 0);
+    waveLabel.x = sceneWidth / 2;
+    waveLabel.y = 5;
+    gameScene.addChild(waveLabel);
+    waveLabel.text = `Wave ${waveNum}`;
+
+    // make earth health label
     earthHealthLabel = new PIXI.Text();
     earthHealthLabel.style = gameLabelStyle;
     earthHealthLabel.anchor.set(1, 0);
     earthHealthLabel.x = 945;
     earthHealthLabel.y = 5;
     gameScene.addChild(earthHealthLabel);
-    decreaseHealthBy(0);
+    decreaseEarthHealthBy(0);
+
+    // make ship lives label
+    shipLivesLabel = new PIXI.Text();
+    shipLivesLabel.style = gameLabelStyle;
+    shipLivesLabel.anchor.set(1, 0);
+    shipLivesLabel.x = 945;
+    shipLivesLabel.y = 45;
+    gameScene.addChild(shipLivesLabel);
+    decreaseEarthHealthBy(0);
+
+    //
+    //  set up 'pauseScene'
+    //  to do
+
+    //
+    //  set up 'upgradesScene'
+    //  to do
+
+
+    //
+    // set up 'gameOverScene'
+    //
+
+    // game over
+    let gameOverText = new PIXI.Text("Game Over!\nYou failed to save the planet :(");
+    gameOverText.style = new PIXI.TextStyle({
+        fill: 0xFFFFFF,
+        fontSize: 64,
+        fontFamily: "Futura",
+        stroke: 0x5D3FD3,
+        strokeThickness: 6,
+        align: "center"
+    });
+    gameOverText.anchor.set(0.5, 0);
+    gameOverText.x = sceneWidth / 2;
+    gameOverText.y = sceneHeight / 2 - 160;
+    gameOverScene.addChild(gameOverText);
+
+    // display final score and wave reached
+    gameOverScoreLabel = new PIXI.Text(`Your final score: ${score}\nWave Reached: ${waveNum}`);
+    let scoreTextStyle = new PIXI.TextStyle({
+        fill: 0xFFFFFF,
+        fontSize: 36,
+        fontFamily: "Futura",
+        fontStyle: "italic",
+        stroke: 0x5D3FD3,
+        strokeThickness: 6,
+        align: "center"
+    });
+    gameOverScoreLabel.style = scoreTextStyle;
+    gameOverScoreLabel.anchor.set(0.5, 0);
+    gameOverScoreLabel.x = sceneWidth / 2;
+    gameOverScoreLabel.y = sceneHeight / 2;
+    gameOverScene.addChild(gameOverScoreLabel);
+
+    // make "play again?" button
+    let playAgainButton = new PIXI.Text("Play Again?");
+    playAgainButton.style = menuButtonStyle;
+    playAgainButton.anchor.set(0.5, 0);
+    playAgainButton.x = sceneWidth / 2;
+    playAgainButton.y = sceneHeight - 100;
+    playAgainButton.interactive = true;
+    playAgainButton.buttonMode = true;
+    playAgainButton.on("pointerup", startGame);
+    playAgainButton.on('pointerover', e => e.target.alpha = 0.7);
+    playAgainButton.on('pointerout', e => e.currentTarget.alpha = 1.0);
+    gameOverScene.addChild(playAgainButton);
 }
 
+// sets everything to proper numbers and starts the game
 function startGame() {
     switchScenes(gameScene);
     score = 0;
     earthHealth = 100;
     waveNum = 1;
+    shipLives = 3;
     increaseScoreBy(0);
-    decreaseHealthBy(0);
+    decreaseEarthHealthBy(0);
+    decreaseShipLivesBy(0);
     ship.x = sceneWidth / 2;
     ship.y = sceneHeight / 2;
     earth.x = sceneWidth / 2;
     earth.y = 400;
+    app.view.onmousedown = fireBullet; // for the ship for fire bullets
+    sendWave();
 }
 
+// loops through the game to keep everything moving and being tracked properly
 function gameLoop() {
+    if (paused) return; // nothing happens if the scene is paused
+
     // Calculate "delta time"
     let dt = 1 / app.ticker.FPS;
     if (dt > 1 / 12) dt = 1 / 12;
 
-    // Player movement
-    // https://www.youtube.com/watch?v=cP-_beFbz_Q
-    // https://www.npmjs.com/package/pixi.js-keyboard
-    // https://www.html5gamedevs.com/topic/11231-keyboard-events/
-    playerInput();
+    // Moving the ship
+    playerMovement();
+
+    // keep the ship on the screen
+    keepShipInBounds();
+
+    // move meteors
+    for (let m of meteors) {
+        m.move(dt);
+    }
+
+    // move bullets
+    for (let b of bullets) {
+        b.move(dt);
+    }
 
 
+    // check for collisions
+    for (let m of meteors) {
+        for (let b of bullets) {
+            // collision of bullets and meteors
+            if (rectsIntersect(m, b)) {
+                gameScene.removeChild(m);
+                m.isAlive = false;
+                gameScene.removeChild(b);
+                b.isAlive = false;
+                increaseScoreBy(1);
+            }
+
+            if (b.y < -10) b.isAlive = false; // removes the bullet when off screen
+        }
+
+        // collision of ship and meteors
+        if (m.isAlive && rectsIntersect(m, ship)) {
+            gameScene.removeChild(m);
+            m.isAlive = false;
+            decreaseShipLivesBy(1);
+        }
+
+        // collision of earth and meteors
+        if (m.isAlive && rectsIntersect(m, earth)) {
+            gameScene.removeChild(m);
+            m.isAlive = false;
+            decreaseEarthHealthBy(20);
+        }
+    }
+
+    // get rid of dead bullets
+    bullets = bullets.filter(b => b.isAlive);
+
+    // get ride of dead meteors
+    meteors = meteors.filter(m => m.isAlive);
+
+    // check for game over
+    if (earthHealth <= 0 || shipLives <= 0) {
+        gameOver();
+        return; // return here so we skip loading the next wave
+    }
+
+    // load next wave
+    if (meteors.length == 0) {
+        waveNum++;
+        sendWave();
+    }
 }
 
-// method to handle any player input
-function playerInput() {
+// method to handle the input for player movement
+function playerMovement() {
     // 'w' or up arrow
     if (keys["87"] || keys["38"]) {
         ship.y -= 5;
@@ -256,47 +437,96 @@ function playerInput() {
     if (keys["68"] || keys["39"]) {
         ship.x += 5;
     }
-    // 'space' or mouse click
-    if (keys["32"]){
-        fireLaser();
-    }
 }
 
-function switchScenes(scene) {
+// makes the current scene invisible and the desired scene visible, and sets the desired scene as the current scene
+function switchScenes(desiredScene) {
     currentScene.visible = false;
     paused = true;
-    scene.visible = true;
-    currentScene = scene;
+    desiredScene.visible = true;
+    currentScene = desiredScene;
 }
 
+// increase score and changes the label's text
 function increaseScoreBy(value) {
     score += value;
     scoreLabel.text = `Score ${score}`;
 }
 
-function decreaseHealthBy(value) {
+// decreases the earth's health and changes the label's text
+function decreaseEarthHealthBy(value) {
     earthHealth -= value;
     earthHealth = parseInt(earthHealth);
     earthHealthLabel.text = `Earth Health  ${earthHealth}`;
 }
 
+// decreases the number of ships left and changes the label's text
+function decreaseShipLivesBy(value) {
+    shipLives -= value;
+    shipLives = parseInt(shipLives);
+    shipLivesLabel.text = `Ships Left  ${shipLives}`;
+}
+
+// keeps the ship on screen
+function keepShipInBounds() {
+    if (ship.x < 0) {
+        ship.x = 0;
+    }
+    if (ship.x > sceneWidth) {
+        ship.x = sceneWidth;
+    }
+    if (ship.y < 0) {
+        ship.y = 0;
+    }
+    if (ship.y > sceneHeight) {
+        ship.y = sceneHeight;
+    }
+}
+
+// creates meteors
 function createMeteors(numMeteors) {
-
+    for (let i = 0; i < numMeteors; i++) {
+        let m = new Meteor();
+        m.x = Math.random() * (sceneWidth - 50) + 25;
+        m.y = Math.random() * (-200 * waveNum) - 50;
+        meteors.push(m);
+        gameScene.addChild(m);
+    }
 }
 
+// sends waves of increasing amounts of meteors
 function sendWave() {
-    createMeteors(waveNum * 5);
-    paused = true;
+    createMeteors(5 + ((waveNum - 1) * 3));
+    paused = false;
+    waveLabel.text = `Wave ${waveNum}`;
 }
 
+// return to the game from the pause screen
 function backToGame() {
-
+    // to do
 }
 
+// when the game ends
 function gameOver() {
+    paused = true;
+    // clear out level
+    meteors.forEach(m => gameScene.removeChild(m));
+    meteors = [];
 
+    bullets.forEach(b => gameScene.removeChild(b));
+    bullets = [];
+
+    switchScenes(gameOverScene);
+
+    gameOverScoreLabel.text = `Your final score: ${score}\nWave Reached: ${waveNum}`;
 }
 
-function fireLaser(e) {
+// fires projectiles
+function fireBullet(e) {
+    console.log("bullet fired")
+    if (paused) return;
 
+    let b = new Bullet(0xFFFFFF, ship.x, ship.y);
+    bullets.push(b);
+    gameScene.addChild(b);
 }

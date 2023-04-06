@@ -1,8 +1,3 @@
-// we use this to keep the ship on the screen
-function clamp(val, min, max) {
-    return val < min ? min : (val > max ? max : val);
-}
-
 // bounding box collision detection - it compares PIXI.Rectangles
 function rectsIntersect(a, b) {
     var ab = a.getBounds();

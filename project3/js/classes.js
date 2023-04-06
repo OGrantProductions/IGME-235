@@ -25,10 +25,19 @@ class Meteor extends PIXI.Sprite {
         this.scale.set(1);
         this.x = x;
         this.y = y;
+
+        // variables
+        this.fwd = { x: 0, y: 1 };
+        this.speed = 50;
+        this.isAlive = true;
+    }
+
+    move(dt = 1 / 60) {
+        this.y += this.fwd.y * this.speed * dt;
     }
 }
 
-class Laser extends PIXI.Graphics {
+class Bullet extends PIXI.Graphics {
     constructor(color = 0xFFFFFF, x = 0, y = 0) {
         super();
         this.beginFill(color);
