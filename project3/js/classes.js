@@ -11,7 +11,7 @@ class Ship extends PIXI.Sprite {
 class Planet extends PIXI.Sprite {
     constructor(x = 0, y = 0) {
         super(app.loader.resources["images/earth.png"].texture);
-        this.anchor.set(.5, 0);
+        this.anchor.set(.5, .5);
         this.scale.set(1.4);
         this.x = x;
         this.y = y;

@@ -340,7 +340,7 @@ function startGame() {
     ship.x = sceneWidth / 2;
     ship.y = sceneHeight / 2;
     earth.x = sceneWidth / 2;
-    earth.y = 400;
+    earth.y = 1100;
     app.view.onmousedown = fireBullet; // for the ship for fire bullets
     sendWave();
 }
@@ -386,14 +386,14 @@ function gameLoop() {
         }
 
         // collision of ship and meteors
-        if (m.isAlive && rectsIntersect(m, ship)) {
+        if (m.isAlive && circlesIntersect(m, ship)) {
             gameScene.removeChild(m);
             m.isAlive = false;
             decreaseShipLivesBy(1);
         }
 
         // collision of earth and meteors
-        if (m.isAlive && rectsIntersect(m, earth)) {
+        if (m.isAlive && circlesIntersect(m, earth)) {
             gameScene.removeChild(m);
             m.isAlive = false;
             decreaseEarthHealthBy(20);
