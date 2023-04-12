@@ -359,6 +359,9 @@ function gameLoop() {
     // keep the ship on the screen
     keepShipInBounds();
 
+    // keeps ship from going behind the planet
+    preventPlanetOverlap();
+
     // move meteors
     for (let m of meteors) {
         m.move(dt);
@@ -480,6 +483,34 @@ function keepShipInBounds() {
     }
     if (ship.y > sceneHeight) {
         ship.y = sceneHeight;
+    }
+}
+
+// keeps ship from overlapping the planet
+function preventPlanetOverlap() {
+    if (circlesIntersect(ship, earth)) {
+        // moving left
+        if (keys["65"] || keys["37"]) {
+            ship.y -= 5;
+        }
+        // moving right
+        if (keys["68"] || keys["39"]) {
+            ship.y -= 5;
+        }
+        // moving down on the left of the screen
+        if ((keys["83"] || keys["40"]) && (ship.x < sceneWidth/2)) {
+            ship.y -= 5;
+            ship.x -= 5;
+        }
+        // moving down on the right of the screen
+        if ((keys["83"] || keys["40"]) && (ship.x > sceneWidth/2)) {
+            ship.y -= 5;
+            ship.x += 5;
+        }
+        // moving down in the center of the screen
+        if ((keys["83"] || keys["40"]) && (ship.x == sceneWidth/2)) {
+            ship.y -= 5;
+        }
     }
 }
 
