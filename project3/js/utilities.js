@@ -12,6 +12,5 @@ function circlesIntersect(a, b) {
     var distX = Math.abs(a.x - b.x);
     var distY = Math.abs(a.y - b.y);
     var distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-    console.log(distance < radiA + radiB);
     return distance < radiA + radiB;
 }

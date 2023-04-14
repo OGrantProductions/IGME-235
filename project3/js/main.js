@@ -14,6 +14,7 @@ document.body.appendChild(app.view);
 // keyboard event handlers
 window.addEventListener("keydown", keysDown);
 window.addEventListener("keyup", keysUp);
+window.addEventListener("keypress", keyPressed);
 let keys = {};
 let keysDiv;
 
@@ -50,6 +51,7 @@ let earthHealth = 100;
 let shipLives = 3;
 let waveNum = 1;
 let paused = true;
+let previouslyPaused = false;
 
 function keysDown(e) {
     console.log(e.keyCode);
@@ -59,6 +61,15 @@ function keysDown(e) {
 function keysUp(e) {
     console.log(e.keyCode);
     keys[e.keyCode] = false;
+}
+
+function keyPressed(e) {
+    console.log(e.keyCode);
+    if (e.keyCode == "112") { // in case 'p' key is pressed
+        pauseScene.visible = !pauseScene.visible;
+        paused = !paused;
+        console.log(paused);
+    }
 }
 
 // Sets up all of the scenes, labels, and assets needed for the game
@@ -89,7 +100,6 @@ function setupGame() {
 
     // Create the `pause` scene and make it invisible
     pauseScene = new PIXI.Container();
-    //pauseScene.alpha = 0.5;
     pauseScene.visible = false;
     stage.addChild(pauseScene);
 
@@ -148,13 +158,6 @@ function startGame() {
 
 // loops through the game to keep everything moving and being tracked properly
 function gameLoop() {
-    if (keys["80"] && pauseScene.visible == false) {
-        pauseScene.visible = true;
-    }
-    if (keys["80"] && pauseScene.visible == true) {
-        pauseScene.visible = false;
-    }
-
     if (paused) return; // nothing happens if the scene is paused
 
     // Calculate "delta time"
@@ -306,17 +309,17 @@ function preventPlanetOverlap() {
             ship.y -= 5;
         }
         // moving down on the left of the screen
-        if ((keys["83"] || keys["40"]) && (ship.x < sceneWidth/2)) {
+        if ((keys["83"] || keys["40"]) && (ship.x < sceneWidth / 2)) {
             ship.y -= 5;
             ship.x -= 5;
         }
         // moving down on the right of the screen
-        if ((keys["83"] || keys["40"]) && (ship.x > sceneWidth/2)) {
+        if ((keys["83"] || keys["40"]) && (ship.x > sceneWidth / 2)) {
             ship.y -= 5;
             ship.x += 5;
         }
         // moving down in the center of the screen
-        if ((keys["83"] || keys["40"]) && (ship.x == sceneWidth/2)) {
+        if ((keys["83"] || keys["40"]) && (ship.x == sceneWidth / 2)) {
             ship.y -= 5;
         }
     }
