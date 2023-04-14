@@ -51,7 +51,6 @@ let earthHealth = 100;
 let shipLives = 3;
 let waveNum = 1;
 let paused = true;
-let previouslyPaused = false;
 
 function keysDown(e) {
     console.log(e.keyCode);
@@ -132,11 +131,6 @@ function setupGame() {
     // Start update loop
     app.ticker.add(gameLoop);
 }
-
-// // Makes all of the labels and buttons for every scene so they're already available when needed
-// function createLabelsAndButtons() {
-
-// }
 
 // sets everything to proper numbers and starts the game
 function startGame() {
@@ -237,19 +231,19 @@ function gameLoop() {
 function playerMovement() {
     // 'w' or up arrow
     if (keys["87"] || keys["38"]) {
-        ship.y -= 5;
+        ship.y -= 5 * movementSpeed;
     }
     // 'a' or left arrow
     if (keys["65"] || keys["37"]) {
-        ship.x -= 5;
+        ship.x -= 5 * movementSpeed;
     }
     // 's' or down arrow
     if (keys["83"] || keys["40"]) {
-        ship.y += 5;
+        ship.y += 5 * movementSpeed;
     }
     // 'd' or right arrow
     if (keys["68"] || keys["39"]) {
-        ship.x += 5;
+        ship.x += 5 * movementSpeed;
     }
 }
 
@@ -302,25 +296,25 @@ function preventPlanetOverlap() {
     if (circlesIntersect(ship, earth)) {
         // moving left
         if (keys["65"] || keys["37"]) {
-            ship.y -= 5;
+            ship.y -= 5 * movementSpeed;
         }
         // moving right
         if (keys["68"] || keys["39"]) {
-            ship.y -= 5;
+            ship.y -= 5 * movementSpeed;
         }
         // moving down on the left of the screen
         if ((keys["83"] || keys["40"]) && (ship.x < sceneWidth / 2)) {
-            ship.y -= 5;
-            ship.x -= 5;
+            ship.y -= 5 * movementSpeed;
+            ship.x -= 5 * movementSpeed;
         }
         // moving down on the right of the screen
         if ((keys["83"] || keys["40"]) && (ship.x > sceneWidth / 2)) {
-            ship.y -= 5;
-            ship.x += 5;
+            ship.y -= 5 * movementSpeed;
+            ship.x += 5 * movementSpeed;
         }
         // moving down in the center of the screen
         if ((keys["83"] || keys["40"]) && (ship.x == sceneWidth / 2)) {
-            ship.y -= 5;
+            ship.y -= 5 * movementSpeed;
         }
     }
 }
