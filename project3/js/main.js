@@ -35,20 +35,14 @@ app.loader.onProgress.add(e => { console.log(`progress=${e.progress}`) });
 app.loader.onComplete.add(setupGame);
 app.loader.load();
 
-
 // aliases
 let stage;
 
-// game variables
-let startScene;
-let instructionsScene;
-let gameScene, ship, earth, scoreLabel, waveLabel, earthHealthLabel, shipLivesLabel;
-let pauseScene;
-let upgradeScene;
-let gameOverScene, gameOverScoreLabel;
-
 let currentScene;
 
+// game variables
+let ship;
+let earth;
 let meteors = [];
 let bullets = [];
 let score = 0;
@@ -95,6 +89,7 @@ function setupGame() {
 
     // Create the `pause` scene and make it invisible
     pauseScene = new PIXI.Container();
+    //pauseScene.alpha = 0.5;
     pauseScene.visible = false;
     stage.addChild(pauseScene);
 
@@ -109,7 +104,12 @@ function setupGame() {
     stage.addChild(gameOverScene);
 
     // Create the labels and buttons for all of the scenes
-    createLabelsAndButtons();
+    setupStartScene();
+    setupInstructionsScene();
+    setupGameScene();
+    setupPauseScene();
+    setupUpgradesScene();
+    setupGameOverScene();
 
     // Create ship
     ship = new Ship();
@@ -123,15 +123,10 @@ function setupGame() {
     app.ticker.add(gameLoop);
 }
 
-// Makes all of the labels and buttons for every scene so they're already available when needed
-function createLabelsAndButtons() {
-    setupStartScene();
-    setupInstructionsScene();
-    setupGameScene();
-    setupPauseScene();
-    setupUpgradesScene();
-    setupGameOverScene();
-}
+// // Makes all of the labels and buttons for every scene so they're already available when needed
+// function createLabelsAndButtons() {
+
+// }
 
 // sets everything to proper numbers and starts the game
 function startGame() {
@@ -153,6 +148,13 @@ function startGame() {
 
 // loops through the game to keep everything moving and being tracked properly
 function gameLoop() {
+    if (keys["80"] && pauseScene.visible == false) {
+        pauseScene.visible = true;
+    }
+    if (keys["80"] && pauseScene.visible == true) {
+        pauseScene.visible = false;
+    }
+
     if (paused) return; // nothing happens if the scene is paused
 
     // Calculate "delta time"

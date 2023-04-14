@@ -1,3 +1,11 @@
+// scenes and labels
+let startScene;
+let instructionsScene;
+let gameScene, scoreLabel, waveLabel, earthHealthLabel, shipLivesLabel;
+let pauseScene;
+let upgradeScene;
+let gameOverScene, gameOverScoreLabel;
+
 let menuButtonStyle = new PIXI.TextStyle({
     fill: 0xFFFFFF,
     fontSize: 48,
@@ -140,7 +148,19 @@ function setupGameScene() {
 
 //  set up 'pauseScene'
 function setupPauseScene() {
-    //  to do
+    // make 'paused' label
+    let pausedText = new PIXI.Text("PAUSED");
+    pausedText.style = new PIXI.TextStyle({
+        fill: 0x5D3FD3,
+        fontSize: 120,
+        fontFamily: "Futura",
+        stroke: 0xFFFFFF,
+        strokeThickness: 10
+    });
+    pausedText.x = sceneWidth / 2;
+    pausedText.y = sceneHeight / 2;
+    pausedText.anchor.set(0.5);
+    pauseScene.addChild(pausedText);
 }
 
 //  set up 'upgradesScene'
