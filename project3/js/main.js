@@ -36,6 +36,7 @@ app.loader.onProgress.add(e => { console.log(`progress=${e.progress}`) });
 app.loader.onComplete.add(setupGame);
 app.loader.load();
 
+let canvas;
 // aliases
 let stage;
 
@@ -50,6 +51,7 @@ let score = 0;
 let earthHealth = 100;
 let shipLives = 3;
 let waveNum = 1;
+let meteorsDestroyed = 0;
 let paused = true;
 
 function keysDown(e) {
@@ -74,6 +76,11 @@ function keyPressed(e) {
 // Sets up all of the scenes, labels, and assets needed for the game
 function setupGame() {
     stage = app.stage;
+
+    // set up css for the canvas
+    canvas = document.querySelector("canvas");
+    canvas.style.margin = "auto";
+    canvas.style.border = "5px solid white";
 
     // create background for every scene
     const background = new PIXI.Sprite(app.loader.resources["images/spaceBackground.jpg"].texture);
@@ -139,6 +146,7 @@ function startGame() {
     earthHealth = 100;
     waveNum = 1;
     shipLives = 3;
+    resetUpgrades();
     increaseScoreBy(0);
     decreaseEarthHealthBy(0);
     decreaseShipLivesBy(0);
@@ -220,10 +228,12 @@ function gameLoop() {
         return; // return here so we skip loading the next wave
     }
 
-    // load next wave
+    // load upgrades scene
     if (meteors.length == 0) {
         waveNum++;
-        sendWave();
+        shopPoints++;
+        shopPointsLabel.text = `Points to Spend: ${shopPoints}`;
+        switchScenes(upgradeScene);
     }
 }
 
@@ -337,11 +347,6 @@ function sendWave() {
     waveLabel.text = `Wave ${waveNum}`;
 }
 
-// return to the game from the pause screen
-function backToGame() {
-    // to do
-}
-
 // when the game ends
 function gameOver() {
     paused = true;
@@ -354,6 +359,7 @@ function gameOver() {
 
     switchScenes(gameOverScene);
 
+    gameOverText.text = `Game Over!\nYou protected the planet\nfrom ${score} meteors!`;
     gameOverScoreLabel.text = `Your final score: ${score}\nWave Reached: ${waveNum}`;
 }
 
@@ -362,7 +368,11 @@ function fireBullet(e) {
     console.log("bullet fired")
     if (paused) return;
 
-    let b = new Bullet(0xFFFFFF, ship.x, ship.y);
-    bullets.push(b);
-    gameScene.addChild(b);
+    for (let i = 0; i < fireRate; i++) {
+        setTimeout(() => {
+            let b = new Bullet(0xFFFFFF, ship.x, ship.y);
+            bullets.push(b);
+            gameScene.addChild(b);
+        }, i * 100); // delays the bullet so that they don't all come out at the same time
+    }
 }
