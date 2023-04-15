@@ -65,21 +65,21 @@ let blastSound;
 let explosionSound;
 
 function keysDown(e) {
-    console.log(e.keyCode);
+    //console.log(e.keyCode);
     keys[e.keyCode] = true;
 }
 
 function keysUp(e) {
-    console.log(e.keyCode);
+    //console.log(e.keyCode);
     keys[e.keyCode] = false;
 }
 
 function keyPressed(e) {
-    console.log(e.keyCode);
+    //console.log(e.keyCode);
     if (e.keyCode == "112") { // in case 'p' key is pressed
         pauseScene.visible = !pauseScene.visible;
         paused = !paused;
-        console.log(paused);
+        //console.log(paused);
     }
 }
 
@@ -407,7 +407,7 @@ function gameOver() {
 
 // fires projectiles
 function fireBullet(e) {
-    console.log("bullet fired")
+    //console.log("bullet fired")
     if (paused) return;
 
     for (let i = 0; i < fireRate; i++) {

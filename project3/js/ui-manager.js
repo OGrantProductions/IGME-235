@@ -9,7 +9,7 @@ let gameOverScene, gameOverText, gameOverScoreLabel;
 let menuButtonStyle = new PIXI.TextStyle({
     fill: 0xFFFFFF,
     fontSize: 48,
-    fontFamily: "Futura"
+    fontFamily: "'Oswald', sans-serif"
 });
 
 // set up 'startScene'
@@ -18,13 +18,13 @@ function setupStartScene() {
     let title = new PIXI.Text("Protect the Planet");
     title.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
-        fontSize: 120,
-        fontFamily: "Futura",
+        fontSize: 100,
+        fontFamily: "'Tilt Prism', cursive",
         stroke: 0xFFFFFF,
         strokeThickness: 10
     });
     title.x = sceneWidth / 2;
-    title.y = 200;
+    title.y = sceneHeight / 2 - 100;
     title.anchor.set(0.5);
     startScene.addChild(title);
 
@@ -62,7 +62,7 @@ function setupInstructionsScene() {
     instructionsTitle.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 90,
-        fontFamily: "Futura",
+        fontFamily: "'Tilt Prism', cursive",
         stroke: 0xFFFFFF,
         strokeThickness: 10
     });
@@ -76,7 +76,7 @@ function setupInstructionsScene() {
     instructions.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 40,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         stroke: 0xFFFFFF,
         strokeThickness: 5,
         align: "center"
@@ -105,7 +105,7 @@ function setupGameScene() {
     let gameLabelStyle = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 36,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         stroke: 0xFFFFFF,
         strokeThickness: 4
     })
@@ -152,7 +152,7 @@ function setupPauseScene() {
     pausedText.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 120,
-        fontFamily: "Futura",
+        fontFamily: "'Tilt Prism', cursive",
         stroke: 0xFFFFFF,
         strokeThickness: 10
     });
@@ -169,7 +169,7 @@ function setupUpgradesScene() {
     upgradesTitle.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 90,
-        fontFamily: "Futura",
+        fontFamily: "'Tilt Prism', cursive",
         stroke: 0xFFFFFF,
         strokeThickness: 10
     });
@@ -182,7 +182,7 @@ function setupUpgradesScene() {
     shopPointsLabel.style = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 50,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         stroke: 0xFFFFFF,
         strokeThickness: 7
     });
@@ -195,7 +195,7 @@ function setupUpgradesScene() {
     let upgradeLabelStyle = new PIXI.TextStyle({
         fill: 0x5D3FD3,
         fontSize: 36,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         stroke: 0xFFFFFF,
         strokeThickness: 4,
         align: "center"
@@ -322,7 +322,7 @@ function setupGameOverScene() {
     gameOverText.style = new PIXI.TextStyle({
         fill: 0xFFFFFF,
         fontSize: 64,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         stroke: 0x5D3FD3,
         strokeThickness: 6,
         align: "center"
@@ -337,7 +337,7 @@ function setupGameOverScene() {
     let scoreTextStyle = new PIXI.TextStyle({
         fill: 0xFFFFFF,
         fontSize: 36,
-        fontFamily: "Futura",
+        fontFamily: "'Oswald', sans-serif",
         fontStyle: "italic",
         stroke: 0x5D3FD3,
         strokeThickness: 6,
