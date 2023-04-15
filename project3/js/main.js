@@ -46,13 +46,23 @@ let currentScene;
 let ship;
 let earth;
 let meteors = [];
+let brokenMeteors = [];
+let brokenMeteorTextures;
 let bullets = [];
+let explosions = [];
+let explosionTextures;
 let score = 0;
 let earthHealth = 100;
 let shipLives = 3;
 let waveNum = 1;
 let meteorsDestroyed = 0;
 let paused = true;
+
+//sounds
+let shootSound;
+let hitSound;
+let blastSound;
+let explosionSound;
 
 function keysDown(e) {
     console.log(e.keyCode);
@@ -135,6 +145,30 @@ function setupGame() {
     earth = new Planet();
     gameScene.addChild(earth);
 
+    // Load Sounds
+    shootSound = new Howl({
+        src: ['sounds/151020__bubaproducer__laser-shot-big-4.wav']
+    });
+
+    hitSound = new Howl({
+        src: ['sounds/330629__stormwaveaudio__sci-fi-force-field-impact-15.wav']
+    });
+
+    blastSound = new Howl({
+        src: ['sounds/683179__stevenmaertens__fireball.wav']
+    });
+
+    explosionSound = new Howl({
+        src: ['sounds/521105__matrixxx__retro_explosion_07.wav']
+    });
+
+    // Load sprite sheet
+    explosionTextures = loadSpriteSheet();
+
+    brokenMeteorTextures = [new PIXI.Texture.from("images/broken_meteor1.png"),
+    new PIXI.Texture.from("images/broken_meteor2.png"),
+    new PIXI.Texture.from("images/broken_meteor3.png")]
+
     // Start update loop
     app.ticker.add(gameLoop);
 }
@@ -196,6 +230,8 @@ function gameLoop() {
                 gameScene.removeChild(b);
                 b.isAlive = false;
                 increaseScoreBy(1);
+                breakMeteor(m.x, m.y, 64, 64);
+                blastSound.play();
             }
 
             if (b.y < -10) b.isAlive = false; // removes the bullet when off screen
@@ -206,6 +242,7 @@ function gameLoop() {
             gameScene.removeChild(m);
             m.isAlive = false;
             decreaseShipLivesBy(1);
+            hitSound.play();
         }
 
         // collision of earth and meteors
@@ -213,6 +250,8 @@ function gameLoop() {
             gameScene.removeChild(m);
             m.isAlive = false;
             decreaseEarthHealthBy(20);
+            createExplosion(m.x, m.y, 64, 64);
+            explosionSound.play();
         }
     }
 
@@ -221,6 +260,9 @@ function gameLoop() {
 
     // get ride of dead meteors
     meteors = meteors.filter(m => m.isAlive);
+
+    // get rid of broken meteors
+    brokenMeteors = brokenMeteors.filter(b => b.isAlive);
 
     // check for game over
     if (earthHealth <= 0 || shipLives <= 0) {
@@ -373,6 +415,56 @@ function fireBullet(e) {
             let b = new Bullet(0xFFFFFF, ship.x, ship.y);
             bullets.push(b);
             gameScene.addChild(b);
+            shootSound.play();
         }, i * 100); // delays the bullet so that they don't all come out at the same time
     }
+}
+
+// animates a shattering meteor
+function breakMeteor(x, y, frameWidth, frameHeight) {
+    let w2 = frameWidth / 2;
+    let h2 = frameHeight / 2;
+    let brokenMeteor = new PIXI.AnimatedSprite(brokenMeteorTextures);
+    brokenMeteor.x = x - w2; // we want the explosions to appear at the center of the circle
+    brokenMeteor.y = y - h2; // ditto
+    brokenMeteor.animationSpeed = 1 / 7;
+    brokenMeteor.loop = false;
+    brokenMeteor.onComplete = e => gameScene.removeChild(brokenMeteor);
+    brokenMeteors.push(brokenMeteor);
+    gameScene.addChild(brokenMeteor);
+    brokenMeteor.play();
+}
+
+// used same explosions as circle blast homework
+function loadSpriteSheet() {
+    // the 16 animation frames in each row are 64x64 pixels
+    // we are using the second row
+    // http://pixijs.download/release/docs/PIXI.BaseTexture.html
+    let spriteSheet = PIXI.BaseTexture.from("images/explosions.png");
+    let width = 64;
+    let height = 64;
+    let numFrames = 16;
+    let textures = [];
+    for (let i = 0; i < numFrames; i++) {
+        // http://pixijs.download/release/docs/PIXI.Texture.html
+        let frame = new PIXI.Texture(spriteSheet, new PIXI.Rectangle(i * width, 64, width, height));
+        textures.push(frame);
+    }
+    return textures;
+}
+
+function createExplosion(x, y, frameWidth, frameHeight) {
+    // http://pixijs.download/release/docs/PIXI.AnimatedSprite.html
+    // the animation frames are 64x64 pixels
+    let w2 = frameWidth / 2;
+    let h2 = frameHeight / 2;
+    let expl = new PIXI.AnimatedSprite(explosionTextures);
+    expl.x = x - w2; // we want the explosions to appear at the center of the circle
+    expl.y = y - h2; // ditto
+    expl.animationSpeed = 1 / 7;
+    expl.loop = false;
+    expl.onComplete = e => gameScene.removeChild(expl);
+    explosions.push(expl);
+    gameScene.addChild(expl);
+    expl.play();
 }
