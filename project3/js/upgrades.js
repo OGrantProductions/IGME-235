@@ -91,7 +91,7 @@ function confirmUpgrades() {
         movementSpeedLabel.text = `Ship Speed:\n${movementSpeed}\nMAXED`;
     }
     if (damage == MAX_DAMAGE) {
-        damageLabel.text = `DAMAGE:\n${damage}\nMAXED`;
+        damageLabel.text = `Damage:\n${damage}\nMAXED`;
     }
     switchScenes(gameScene);
     sendWave();
