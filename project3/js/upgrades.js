@@ -73,6 +73,10 @@ function resetUpgrades() {
     damage = 1;
     minDamage = 1;
     shopPoints = 0;
+    shopPointsLabel.text = `Points to Spend: ${shopPoints}`;
+    fireRateLabel.text = `Fire Rate:\n${fireRate}`;
+    movementSpeedLabel.text = `Ship Speed:\n${movementSpeed}`;
+    damageLabel.text = `Damage:\n${damage}`;
 }
 
 // confirm all of the upgrades and goes back to the game
@@ -84,10 +88,10 @@ function confirmUpgrades() {
         fireRateLabel.text = `Fire Rate:\n${fireRate}\nMAXED`;
     }
     if (movementSpeed == MAX_SPEED) {
-        fireRateLabel.text = `Ship Speed:\n${movementSpeed}\nMAXED`;
+        movementSpeedLabel.text = `Ship Speed:\n${movementSpeed}\nMAXED`;
     }
     if (damage == MAX_DAMAGE) {
-        fireRateLabel.text = `DAMAGE:\n${damage}\nMAXED`;
+        damageLabel.text = `Damage:\n${damage}\nMAXED`;
     }
     switchScenes(gameScene);
     sendWave();
